@@ -1,0 +1,31 @@
+{
+    "version": "1.0.0-*",
+    "description": "OAuth2 introspection middleware for ASP.NET 5",
+    "authors": [ "Kévin Chalet" ],
+    "owners": [ "Kévin Chalet" ],
+
+    "projectUrl": "https://github.com/aspnet-contrib/AspNet.Security.OAuth.Extensions",
+    "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0.html",
+
+    "dependencies": {
+        "Microsoft.AspNet.Authentication": "1.0.0-*",
+
+        "Microsoft.Extensions.Caching.Abstractions": "1.0.0-*",
+
+        "Microsoft.Extensions.NotNullAttribute.Sources": {
+            "type": "build",
+            "version": "1.0.0-*"
+        },
+
+        "Newtonsoft.Json": "7.0.1"
+    },
+
+    "frameworks": {
+        "dnx451": { },
+        "dnxcore50": {
+            "dependencies": {
+                "System.Dynamic.Runtime": "4.0.11-*"
+            }
+        }
+    }
+}
