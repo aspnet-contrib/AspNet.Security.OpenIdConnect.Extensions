@@ -11,6 +11,10 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "AspNet.Security.OAuth.Intro
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "AspNet.Security.OAuth.Introspection.Tests", "test\AspNet.Security.OAuth.Introspection.Tests\AspNet.Security.OAuth.Introspection.Tests.xproj", "{4070DC46-0FD5-4ADD-95B3-E9908AD82407}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "AspNet.Security.OAuth.Validation", "src\AspNet.Security.OAuth.Validation\AspNet.Security.OAuth.Validation.xproj", "{043FD757-9C69-4A68-93BF-EAD2672BBD78}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "AspNet.Security.OAuth.Validation.Tests", "test\AspNet.Security.OAuth.Validation.Tests\AspNet.Security.OAuth.Validation.Tests.xproj", "{FC99E58D-86BC-4EAD-B282-C9F1491CCF96}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +29,14 @@ Global
 		{4070DC46-0FD5-4ADD-95B3-E9908AD82407}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4070DC46-0FD5-4ADD-95B3-E9908AD82407}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4070DC46-0FD5-4ADD-95B3-E9908AD82407}.Release|Any CPU.Build.0 = Release|Any CPU
+		{043FD757-9C69-4A68-93BF-EAD2672BBD78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{043FD757-9C69-4A68-93BF-EAD2672BBD78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{043FD757-9C69-4A68-93BF-EAD2672BBD78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{043FD757-9C69-4A68-93BF-EAD2672BBD78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC99E58D-86BC-4EAD-B282-C9F1491CCF96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC99E58D-86BC-4EAD-B282-C9F1491CCF96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC99E58D-86BC-4EAD-B282-C9F1491CCF96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC99E58D-86BC-4EAD-B282-C9F1491CCF96}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,5 +44,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{A8569260-142C-427A-8B14-A8DF56CC15B7} = {7AADF737-9B13-4E5C-8F32-8BF21429E093}
 		{4070DC46-0FD5-4ADD-95B3-E9908AD82407} = {2B1B08E0-E9A3-40C0-B200-DE09952AF0E7}
+		{043FD757-9C69-4A68-93BF-EAD2672BBD78} = {7AADF737-9B13-4E5C-8F32-8BF21429E093}
+		{FC99E58D-86BC-4EAD-B282-C9F1491CCF96} = {2B1B08E0-E9A3-40C0-B200-DE09952AF0E7}
 	EndGlobalSection
 EndGlobal
