@@ -18,6 +18,19 @@ namespace Microsoft.AspNet.Builder {
         /// Adds a new instance of the OAuth2 validation middleware in the ASP.NET 5 pipeline.
         /// </summary>
         /// <param name="app">The application builder.</param>
+        /// <returns>The application builder.</returns>
+        public static IApplicationBuilder UseOAuthValidation([NotNull] this IApplicationBuilder app) {
+            if (app == null) {
+                throw new ArgumentNullException(nameof(app));
+            }
+
+            return app.UseOAuthValidation(options => { });
+        }
+
+        /// <summary>
+        /// Adds a new instance of the OAuth2 validation middleware in the ASP.NET 5 pipeline.
+        /// </summary>
+        /// <param name="app">The application builder.</param>
         /// <param name="configuration">The delegate used to configure the validation options.</param>
         /// <returns>The application builder.</returns>
         public static IApplicationBuilder UseOAuthValidation(
