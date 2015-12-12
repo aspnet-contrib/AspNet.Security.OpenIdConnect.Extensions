@@ -24,21 +24,21 @@ namespace AspNet.Security.OAuth.Introspection {
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync() {
             string header = Request.Headers[HeaderNames.Authorization];
             if (string.IsNullOrEmpty(header)) {
-                return AuthenticateResult.Failed("Authentication failed because the bearer token " +
-                                                 "was missing from the 'Authorization' header.");
+                return AuthenticateResult.Fail("Authentication failed because the bearer token " +
+                                               "was missing from the 'Authorization' header.");
             }
 
             // Ensure that the authorization header contains the mandatory "Bearer" scheme.
             // See https://tools.ietf.org/html/rfc6750#section-2.1
             if (!header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)) {
-                return AuthenticateResult.Failed("Authentication failed because an invalid scheme " +
-                                                 "was used in the 'Authorization' header.");
+                return AuthenticateResult.Fail("Authentication failed because an invalid scheme " +
+                                               "was used in the 'Authorization' header.");
             }
 
             var token = header.Substring("Bearer ".Length);
             if (string.IsNullOrWhiteSpace(token)) {
-                return AuthenticateResult.Failed("Authentication failed because the bearer token " +
-                                                 "was missing from the 'Authorization' header.");
+                return AuthenticateResult.Fail("Authentication failed because the bearer token " +
+                                               "was missing from the 'Authorization' header.");
             }
 
             // Try to resolve the authentication ticket from the distributed cache. If none
@@ -49,15 +49,15 @@ namespace AspNet.Security.OAuth.Introspection {
                 // request failed or if the "active" claim was false.
                 var payload = await GetIntrospectionPayloadAsync(token);
                 if (payload == null || !payload.Value<bool>(OAuthIntrospectionConstants.Claims.Active)) {
-                    return AuthenticateResult.Failed("Authentication failed because the authorization " +
-                                                     "server rejected the access token.");
+                    return AuthenticateResult.Fail("Authentication failed because the authorization " +
+                                                   "server rejected the access token.");
                 }
 
                 // Ensure that the access token was issued
                 // to be used with this resource server.
                 if (!await ValidateAudienceAsync(payload)) {
-                    return AuthenticateResult.Failed("Authentication failed because the access token " +
-                                                     "was not valid for this resource server.");
+                    return AuthenticateResult.Fail("Authentication failed because the access token " +
+                                                   "was not valid for this resource server.");
                 }
 
                 // Create a new authentication ticket from the introspection
@@ -71,7 +71,7 @@ namespace AspNet.Security.OAuth.Introspection {
             // Ensure that the authentication ticket is still valid.
             if (ticket.Properties.ExpiresUtc.HasValue &&
                 ticket.Properties.ExpiresUtc.Value < Options.SystemClock.UtcNow) {
-                return AuthenticateResult.Failed("Authentication failed because the access token was expired.");
+                return AuthenticateResult.Fail("Authentication failed because the access token was expired.");
             }
 
             return AuthenticateResult.Success(ticket);
