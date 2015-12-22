@@ -15,6 +15,7 @@ using AspNet.Security.OpenIdConnect.Extensions;
 using AspNet.Security.OpenIdConnect.Server;
 using Microsoft.AspNet.Authentication;
 using Microsoft.AspNet.Builder;
+using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Authentication;
 using Microsoft.AspNet.TestHost;
@@ -205,16 +206,16 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
         private static TestServer CreateResourceServer(Action<OAuthIntrospectionOptions> configuration) {
             var server = CreateAuthorizationServer(options => { });
 
-            var builder = TestServer.CreateBuilder();
+            var builder = new WebApplicationBuilder();
 
             builder.UseEnvironment("Testing");
 
-            builder.UseServices(services => {
+            builder.ConfigureServices(services => {
                 services.AddAuthentication();
                 services.AddCaching();
             });
 
-            builder.UseStartup(app => {
+            builder.Configure(app => {
                 app.UseOAuthIntrospection(options => {
                     options.AutomaticAuthenticate = true;
                     options.AutomaticChallenge = true;
@@ -240,17 +241,17 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
         }
 
         private static TestServer CreateAuthorizationServer(Action<OpenIdConnectServerOptions> configuration) {
-            var builder = TestServer.CreateBuilder();
+            var builder = new WebApplicationBuilder();
 
             builder.UseEnvironment("Testing");
 
-            builder.UseServices(services => {
+            builder.ConfigureServices(services => {
                 services.AddAuthentication();
                 services.AddCaching();
                 services.AddLogging();
             });
 
-            builder.UseStartup(app => {
+            builder.Configure(app => {
                 var factory = app.ApplicationServices.GetRequiredService<ILoggerFactory>();
                 factory.AddDebug();
 

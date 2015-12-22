@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using AspNet.Security.OpenIdConnect.Extensions;
 using Microsoft.AspNet.Authentication;
 using Microsoft.AspNet.Builder;
+using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Authentication;
 using Microsoft.AspNet.TestHost;
@@ -134,7 +135,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
         }
 
         private static TestServer CreateResourceServer(Action<OAuthValidationOptions> configuration = null) {
-            var builder = TestServer.CreateBuilder();
+            var builder = new WebApplicationBuilder();
 
             var format = new Mock<ISecureDataFormat<AuthenticationTicket>>();
 
@@ -193,11 +194,11 @@ namespace AspNet.Security.OAuth.Validation.Tests {
 
             builder.UseEnvironment("Testing");
 
-            builder.UseServices(services => {
+            builder.ConfigureServices(services => {
                 services.AddAuthentication();
             });
 
-            builder.UseStartup(app => {
+            builder.Configure(app => {
                 app.UseOAuthValidation(options => {
                     options.AutomaticAuthenticate = true;
                     options.AutomaticChallenge = true;
