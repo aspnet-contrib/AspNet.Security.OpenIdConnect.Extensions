@@ -289,17 +289,21 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
                                 ExpiresUtc = context.Options.SystemClock.UtcNow + TimeSpan.FromDays(1)
                             };
 
-                            properties.SetUsage(OpenIdConnectConstants.Usages.AccessToken);
+                            var ticket = new AuthenticationTicket(
+                                new ClaimsPrincipal(identity),
+                                properties, context.Options.AuthenticationScheme);
+
+                            ticket.SetUsage(OpenIdConnectConstants.Usages.AccessToken);
 
                             switch (context.AccessToken) {
                                 case "token-2": {
-                                    properties.SetAudiences(new[] { "http://www.google.com/" });
+                                    ticket.SetAudiences(new[] { "http://www.google.com/" });
 
                                     break;
                                 }
 
                                 case "token-3": {
-                                    properties.SetAudiences(new[] {
+                                    ticket.SetAudiences(new[] {
                                         "http://www.google.com/",
                                         "http://www.fabrikam.com/"
                                     });
@@ -308,16 +312,15 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
                                 }
 
                                 case "token-4": {
-                                    properties.ExpiresUtc = context.Options.SystemClock.UtcNow + TimeSpan.FromSeconds(2);
+                                    ticket.Properties.ExpiresUtc = context.Options.SystemClock.UtcNow +
+                                                                   TimeSpan.FromSeconds(2);
 
                                     break;
                                 }
                             }
 
                             // Return a new authentication ticket containing the principal.
-                            context.AuthenticationTicket = new AuthenticationTicket(
-                                new ClaimsPrincipal(identity), properties,
-                                context.Options.AuthenticationScheme);
+                            context.AuthenticationTicket = ticket;
 
                             return Task.FromResult(0);
                         }
