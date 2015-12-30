@@ -7,7 +7,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AspNet.Security.OpenIdConnect.Extensions;
 using Microsoft.AspNet.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
@@ -65,14 +64,18 @@ namespace AspNet.Security.OAuth.Validation {
                 return Task.FromResult(true);
             }
 
-            // Ensure that the registered audience can be found in the
-            // "audiences" property stored in the authentication ticket.
-            var audiences = ticket.GetAudiences();
-            if (audiences.Contains(Options.Audience, StringComparer.Ordinal)) {
-                return Task.FromResult(true);
+            // Extract the audiences from the authentication ticket.
+            string audiences;
+            if (!ticket.Properties.Items.TryGetValue(OAuthValidationConstants.Properties.Audiences, out audiences)) {
+                return Task.FromResult(false);
             }
 
-            return Task.FromResult(false);
+            // Ensure that the authentication ticket contains the registered audience.
+            if (!audiences.Split(' ').Contains(Options.Audience, StringComparer.Ordinal)) {
+                return Task.FromResult(false);
+            }
+
+            return Task.FromResult(true);
         }
     }
 }

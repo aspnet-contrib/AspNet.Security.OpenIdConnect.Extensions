@@ -5,13 +5,13 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using AspNet.Security.OpenIdConnect.Extensions;
 using Microsoft.AspNet.Authentication;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
@@ -158,12 +158,12 @@ namespace AspNet.Security.OAuth.Validation.Tests {
                       var identity = new ClaimsIdentity(OAuthValidationDefaults.AuthenticationScheme);
                       identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, "Fabrikam"));
 
-                      var ticket = new AuthenticationTicket(new ClaimsPrincipal(identity),
-                          null, OAuthValidationDefaults.AuthenticationScheme);
+                      var properties = new AuthenticationProperties(new Dictionary<string, string> {
+                          [OAuthValidationConstants.Properties.Audiences] = "http://www.google.com/"
+                      });
 
-                      ticket.SetAudiences(new[] { "http://www.google.com/" });
-
-                      return ticket;
+                      return new AuthenticationTicket(new ClaimsPrincipal(identity),
+                          properties, OAuthValidationDefaults.AuthenticationScheme);
                   });
 
             format.Setup(mock => mock.Unprotect(It.Is<string>(token => token == "token-3")))
@@ -171,15 +171,12 @@ namespace AspNet.Security.OAuth.Validation.Tests {
                       var identity = new ClaimsIdentity(OAuthValidationDefaults.AuthenticationScheme);
                       identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, "Fabrikam"));
 
-                      var ticket = new AuthenticationTicket(new ClaimsPrincipal(identity),
-                          null, OAuthValidationDefaults.AuthenticationScheme);
-
-                      ticket.SetAudiences(new[] {
-                          "http://www.google.com/",
-                          "http://www.fabrikam.com/"
+                      var properties = new AuthenticationProperties(new Dictionary<string, string> {
+                          [OAuthValidationConstants.Properties.Audiences] = "http://www.google.com/ http://www.fabrikam.com/"
                       });
 
-                      return ticket;
+                      return new AuthenticationTicket(new ClaimsPrincipal(identity),
+                          properties, OAuthValidationDefaults.AuthenticationScheme);
                   });
 
             format.Setup(mock => mock.Unprotect(It.Is<string>(token => token == "token-4")))
@@ -216,7 +213,8 @@ namespace AspNet.Security.OAuth.Validation.Tests {
                         return context.Authentication.ChallengeAsync();
                     }
 
-                    return context.Response.WriteAsync(context.User.GetClaim(ClaimTypes.NameIdentifier));
+                    var identifier = context.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    return context.Response.WriteAsync(identifier);
                 });
             });
 

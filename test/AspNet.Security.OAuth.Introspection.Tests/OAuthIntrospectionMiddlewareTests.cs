@@ -297,16 +297,13 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
 
                             switch (context.AccessToken) {
                                 case "token-2": {
-                                    ticket.SetAudiences(new[] { "http://www.google.com/" });
+                                    ticket.SetAudiences("http://www.google.com/");
 
                                     break;
                                 }
 
                                 case "token-3": {
-                                    ticket.SetAudiences(new[] {
-                                        "http://www.google.com/",
-                                        "http://www.fabrikam.com/"
-                                    });
+                                    ticket.SetAudiences("http://www.google.com/", "http://www.fabrikam.com/");
 
                                     break;
                                 }
