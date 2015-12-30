@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AspNet.Security.OpenIdConnect.Extensions;
 using Microsoft.AspNet.Authentication;
+using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 
 namespace AspNet.Security.OAuth.Validation {
@@ -16,8 +17,9 @@ namespace AspNet.Security.OAuth.Validation {
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync() {
             string header = Request.Headers[HeaderNames.Authorization];
             if (string.IsNullOrEmpty(header)) {
-                return AuthenticateResult.Fail("Authentication failed because the bearer token " +
-                                               "was missing from the 'Authorization' header.");
+                Logger.LogDebug("Authentication was skipped because no bearer token was received.");
+
+                return AuthenticateResult.Skip();
             }
 
             // Ensure that the authorization header contains the mandatory "Bearer" scheme.
