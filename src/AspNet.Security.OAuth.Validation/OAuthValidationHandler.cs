@@ -60,7 +60,7 @@ namespace AspNet.Security.OAuth.Validation {
         protected virtual Task<bool> ValidateAudienceAsync(AuthenticationTicket ticket) {
             // If no explicit audience has been configured,
             // skip the default audience validation.
-            if (string.IsNullOrEmpty(Options.Audience)) {
+            if (Options.Audiences.Count == 0) {
                 return Task.FromResult(true);
             }
 
@@ -71,7 +71,7 @@ namespace AspNet.Security.OAuth.Validation {
             }
 
             // Ensure that the authentication ticket contains the registered audience.
-            if (!audiences.Split(' ').Contains(Options.Audience, StringComparer.Ordinal)) {
+            if (!audiences.Split(' ').Intersect(Options.Audiences, StringComparer.Ordinal).Any()) {
                 return Task.FromResult(false);
             }
 
