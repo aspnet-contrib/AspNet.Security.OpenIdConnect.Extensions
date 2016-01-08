@@ -4,6 +4,7 @@
  * concerning the license and the contributors participating to this project.
  */
 
+using System.Collections.Generic;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
@@ -15,11 +16,11 @@ namespace Owin.Security.OAuth.Validation {
         }
 
         /// <summary>
-        /// Gets or sets the intended audience of this resource server.
+        /// Gets or sets the intended audiences of this resource server.
         /// Setting this property is recommended when the authorization
         /// server issues access tokens for multiple distinct resource servers.
         /// </summary>
-        public string Audience { get; set; }
+        public IList<string> Audiences { get; } = new List<string>();
 
         /// <summary>
         /// Gets or sets the logger used by <see cref="OAuthValidationMiddleware"/>.
