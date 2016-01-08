@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -155,7 +156,7 @@ namespace Owin.Security.OAuth.Introspection {
         protected virtual Task<bool> ValidateAudienceAsync(JObject payload) {
             // If no explicit audience has been configured,
             // skip the default audience validation.
-            if (string.IsNullOrEmpty(Options.Audience)) {
+            if (Options.Audiences.Count == 0) {
                 return Task.FromResult(true);
             }
 
@@ -171,20 +172,19 @@ namespace Owin.Security.OAuth.Introspection {
                 case JTokenType.Array: {
                     // When the "aud" claim is an array, at least one value must correspond
                     // to the audience registered in the introspection middleware options.
-                    foreach (var audience in payload.Value<JArray>(OAuthIntrospectionConstants.Claims.Audience)) {
-                        if (string.Equals(audience.Value<string>(), Options.Audience, StringComparison.Ordinal)) {
-                            return Task.FromResult(true);
-                        }
+                    var audiences = payload.Value<JArray>(OAuthIntrospectionConstants.Claims.Audience).Select(audience => audience.Value<string>());
+                    if (audiences.Intersect(Options.Audiences, StringComparer.Ordinal).Any()) {
+                        return Task.FromResult(true);
                     }
 
                     return Task.FromResult(false);
                 }
-                    
+
                 case JTokenType.String: {
                     // When the "aud" claim is a string, it must exactly match the
                     // audience registered in the introspection middleware options.
                     var audience = payload.Value<string>(OAuthIntrospectionConstants.Claims.Audience);
-                    if (string.Equals(audience, Options.Audience, StringComparison.Ordinal)) {
+                    if (Options.Audiences.Contains(audience, StringComparer.Ordinal)) {
                         return Task.FromResult(true);
                     }
 
@@ -219,8 +219,8 @@ namespace Owin.Security.OAuth.Introspection {
 
                         continue;
                     }
-                    
-                    
+
+
                     case OAuthIntrospectionConstants.Claims.ExpiresAt: {
 #if DNXCORE50
                         // Convert the UNIX timestamp to a DateTimeOffset.
@@ -246,7 +246,7 @@ namespace Owin.Security.OAuth.Introspection {
 
                         continue;
                     }
-                    
+
                     // Extract the scope values from the space-delimited
                     // "scope" claim and store them as individual claims.
                     // See https://tools.ietf.org/html/rfc7662#section-2.2

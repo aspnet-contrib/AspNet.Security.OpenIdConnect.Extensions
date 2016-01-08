@@ -59,7 +59,7 @@ namespace Owin.Security.OAuth.Validation.Tests {
         public async Task MissingAudienceCausesInvalidAuthentication() {
             // Arrange
             var server = CreateResourceServer(options => {
-                options.Audience = "http://www.fabrikam.com/";
+                options.Audiences.Add("http://www.fabrikam.com/");
             });
 
             var client = server.HttpClient;
@@ -78,7 +78,7 @@ namespace Owin.Security.OAuth.Validation.Tests {
         public async Task InvalidAudienceCausesInvalidAuthentication() {
             // Arrange
             var server = CreateResourceServer(options => {
-                options.Audience = "http://www.fabrikam.com/";
+                options.Audiences.Add("http://www.fabrikam.com/");
             });
 
             var client = server.HttpClient;
@@ -97,7 +97,49 @@ namespace Owin.Security.OAuth.Validation.Tests {
         public async Task ValidAudienceAllowsSuccessfulAuthentication() {
             // Arrange
             var server = CreateResourceServer(options => {
-                options.Audience = "http://www.fabrikam.com/";
+                options.Audiences.Add("http://www.fabrikam.com/");
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-3");
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("Fabrikam", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task AnyMatchingAudienceCausesSuccessfulAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.Audiences.Add("http://www.fabrikam.com/");
+                options.Audiences.Add("http://www.google.com/");
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-2");
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("Fabrikam", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task MultipleMatchingAudienceCausesSuccessfulAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.Audiences.Add("http://www.fabrikam.com/");
+                options.Audiences.Add("http://www.google.com/");
             });
 
             var client = server.HttpClient;
@@ -178,7 +220,7 @@ namespace Owin.Security.OAuth.Validation.Tests {
 
                       return new AuthenticationTicket(identity, properties);
                   });
-            
+
             return TestServer.Create(app => {
                 app.UseOAuthValidation(options => {
                     options.AuthenticationMode = AuthenticationMode.Active;

@@ -109,7 +109,7 @@ namespace Owin.Security.OAuth.Introspection.Tests {
         public async Task MissingAudienceCausesInvalidAuthentication() {
             // Arrange
             var server = CreateResourceServer(options => {
-                options.Audience = "http://www.fabrikam.com/";
+                options.Audiences.Add("http://www.fabrikam.com/");
                 options.ClientId = "Fabrikam";
                 options.ClientSecret = "B4657E03-D619";
             });
@@ -130,7 +130,7 @@ namespace Owin.Security.OAuth.Introspection.Tests {
         public async Task InvalidAudienceCausesInvalidAuthentication() {
             // Arrange
             var server = CreateResourceServer(options => {
-                options.Audience = "http://www.fabrikam.com/";
+                options.Audiences.Add("http://www.fabrikam.com/");
                 options.ClientId = "Fabrikam";
                 options.ClientSecret = "B4657E03-D619";
             });
@@ -151,7 +151,53 @@ namespace Owin.Security.OAuth.Introspection.Tests {
         public async Task ValidAudienceAllowsSuccessfulAuthentication() {
             // Arrange
             var server = CreateResourceServer(options => {
-                options.Audience = "http://www.fabrikam.com/";
+                options.Audiences.Add("http://www.fabrikam.com/");
+                options.ClientId = "Fabrikam";
+                options.ClientSecret = "B4657E03-D619";
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-3");
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("Fabrikam", await response.Content.ReadAsStringAsync());
+        }
+
+        [ConditionalFact, FrameworkSkipCondition(RuntimeFrameworks.Mono)]
+        public async Task AnyMatchingAudienceCausesSuccessfulAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.Audiences.Add("http://www.fabrikam.com/");
+                options.Audiences.Add("http://www.google.com/");
+                options.ClientId = "Fabrikam";
+                options.ClientSecret = "B4657E03-D619";
+                            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-2");
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("Fabrikam", await response.Content.ReadAsStringAsync());
+        }
+
+        [ConditionalFact, FrameworkSkipCondition(RuntimeFrameworks.Mono)]
+        public async Task MultipleMatchingAudienceCausesSuccessfulAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.Audiences.Add("http://www.fabrikam.com/");
+                options.Audiences.Add("http://www.google.com/");
                 options.ClientId = "Fabrikam";
                 options.ClientSecret = "B4657E03-D619";
             });
@@ -285,8 +331,7 @@ namespace Owin.Security.OAuth.Introspection.Tests {
                                 }
 
                                 case "token-4": {
-                                    ticket.Properties.ExpiresUtc = context.Options.SystemClock.UtcNow +
-                                                                   TimeSpan.FromSeconds(2);
+                                    ticket.Properties.ExpiresUtc = context.Options.SystemClock.UtcNow + TimeSpan.FromSeconds(2);
 
                                     break;
                                 }
