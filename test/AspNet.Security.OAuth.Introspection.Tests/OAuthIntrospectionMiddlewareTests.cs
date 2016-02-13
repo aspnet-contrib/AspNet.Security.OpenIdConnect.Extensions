@@ -304,9 +304,9 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
                 // Add a new OpenID Connect server instance.
                 app.UseOpenIdConnectServer(options => {
                     options.Provider = new OpenIdConnectServerProvider {
-                        // Implement ValidateClientAuthentication
+                        // Implement ValidateIntrospectionRequest
                         // to bypass client authentication.
-                        OnValidateClientAuthentication = context => {
+                        OnValidateIntrospectionRequest = context => {
                             if (string.IsNullOrEmpty(context.ClientId) ||
                                 string.IsNullOrEmpty(context.ClientSecret)) {
                                 context.Reject();
