@@ -11,31 +11,36 @@
 
     "dependencies": {
         "AspNet.Security.OAuth.Validation": "1.0.0-*",
-
-        "Microsoft.AspNet.Testing": "1.0.0-*",
-        "Microsoft.AspNet.TestHost": "1.0.0-*",
-
+        "Microsoft.AspNetCore.Testing": "1.0.0-*",
+        "Microsoft.AspNetCore.TestHost": "1.0.0-*",
         "Microsoft.Extensions.Caching.Memory": "1.0.0-*",
         "Microsoft.Extensions.Logging.Debug": "1.0.0-*",
-
-        "xunit.runner.aspnet": "2.0.0-aspnet-*"
-    },
-
-    "commands": {
-        "test": "xunit.runner.aspnet"
+        "Microsoft.NETCore.Platforms": "1.0.1-*",
+        "xunit": "2.1.0",
+        "xunit.runner.aspnet": "2.0.0-aspnet-rc2-*"
     },
 
     "frameworks": {
         "dnx451": {
             "dependencies": {
-                "Moq": "4.2.1312.1622"
+                "Moq": "4.2.1312.1622",
+                "xunit.runner.console": "2.1.0"
             }
         },
 
         "dnxcore50": {
             "dependencies": {
+                "dotnet-test-xunit": "1.0.0-dev-*",
                 "moq.netcore": "4.4.0-*"
-            }
+            },
+
+            "imports": "portable-net451+win8"
         }
+    },
+
+    "testRunner": "xunit",
+
+    "commands": {
+        "test": "xunit.runner.aspnet"
     }
 }

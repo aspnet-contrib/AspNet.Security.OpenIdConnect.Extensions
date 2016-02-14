@@ -6,7 +6,8 @@
 
 using System.Collections.Generic;
 using System.Net.Http;
-using Microsoft.AspNet.Authentication;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace AspNet.Security.OAuth.Introspection {

@@ -12,12 +12,12 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Authentication;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Authentication;
-using Microsoft.AspNet.TestHost;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Authentication;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
@@ -177,7 +177,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
         }
 
         private static TestServer CreateResourceServer(Action<OAuthValidationOptions> configuration = null) {
-            var builder = new WebApplicationBuilder();
+            var builder = new WebHostBuilder();
 
             var format = new Mock<ISecureDataFormat<AuthenticationTicket>>();
 

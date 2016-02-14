@@ -5,7 +5,8 @@
  */
 
 using System.Collections.Generic;
-using Microsoft.AspNet.Authentication;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
 
 namespace AspNet.Security.OAuth.Validation {
     public class OAuthValidationOptions : AuthenticationOptions {

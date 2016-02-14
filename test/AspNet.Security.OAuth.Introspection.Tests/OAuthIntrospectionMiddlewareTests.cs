@@ -12,10 +12,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.TestHost;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -243,7 +243,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
         private static TestServer CreateResourceServer(Action<OAuthIntrospectionOptions> configuration) {
             var server = CreateAuthorizationServer();
 
-            var builder = new WebApplicationBuilder();
+            var builder = new WebHostBuilder();
 
             builder.UseEnvironment("Testing");
 
@@ -278,7 +278,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
         }
 
         private static TestServer CreateAuthorizationServer() {
-            var builder = new WebApplicationBuilder();
+            var builder = new WebHostBuilder();
 
             builder.UseEnvironment("Testing");
 

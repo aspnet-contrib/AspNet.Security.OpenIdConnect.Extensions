@@ -6,9 +6,10 @@
 
 using System;
 using AspNet.Security.OAuth.Introspection;
-using Microsoft.Extensions.Internal;
+using JetBrains.Annotations;
+using Microsoft.Extensions.Options;
 
-namespace Microsoft.AspNet.Builder {
+namespace Microsoft.AspNetCore.Builder {
     /// <summary>
     /// Provides extension methods used to configure the OAuth2
     /// introspection middleware in an ASP.NET 5 pipeline.
@@ -54,7 +55,7 @@ namespace Microsoft.AspNet.Builder {
                 throw new ArgumentNullException(nameof(options));
             }
 
-            return app.UseMiddleware<OAuthIntrospectionMiddleware>(options);
+            return app.UseMiddleware<OAuthIntrospectionMiddleware>(Options.Create(options));
         }
     }
 }

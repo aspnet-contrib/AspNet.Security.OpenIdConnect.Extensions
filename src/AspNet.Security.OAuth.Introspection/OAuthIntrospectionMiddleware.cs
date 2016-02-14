@@ -7,42 +7,43 @@
 using System;
 using System.Net.Http;
 using System.Text.Encodings.Web;
-using Microsoft.AspNet.Authentication;
-using Microsoft.AspNet.Http;
+using JetBrains.Annotations;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AspNet.Security.OAuth.Introspection {
     public class OAuthIntrospectionMiddleware : AuthenticationMiddleware<OAuthIntrospectionOptions> {
         public OAuthIntrospectionMiddleware(
             [NotNull] RequestDelegate next,
-            [NotNull] OAuthIntrospectionOptions options,
+            [NotNull] IOptions<OAuthIntrospectionOptions> options,
             [NotNull] ILoggerFactory loggerFactory,
             [NotNull] UrlEncoder encoder,
             [NotNull] IDistributedCache cache)
             : base(next, options, loggerFactory, encoder) {
-            if (string.IsNullOrEmpty(options.Authority) &&
-                string.IsNullOrEmpty(options.IntrospectionEndpoint)) {
+            if (string.IsNullOrEmpty(Options.Authority) &&
+                string.IsNullOrEmpty(Options.IntrospectionEndpoint)) {
                 throw new ArgumentException("The authority or the introspection endpoint must be configured.", nameof(options));
             }
 
-            if (string.IsNullOrEmpty(options.ClientId) ||
-                string.IsNullOrEmpty(options.ClientSecret)) {
+            if (string.IsNullOrEmpty(Options.ClientId) ||
+                string.IsNullOrEmpty(Options.ClientSecret)) {
                 throw new ArgumentException("Client credentials must be configured.", nameof(options));
             }
 
-            if (options.Cache == null) {
-                options.Cache = cache;
+            if (Options.Cache == null) {
+                Options.Cache = cache;
             }
 
-            if (options.HttpClient == null) {
-                options.HttpClient = new HttpClient {
+            if (Options.HttpClient == null) {
+                Options.HttpClient = new HttpClient {
                     Timeout = TimeSpan.FromSeconds(60),
                     MaxResponseContentBufferSize = 1024 * 1024 * 10
                 };
 
-                options.HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("ASP.NET OAuth2 introspection middleware");
+                Options.HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("ASP.NET OAuth2 introspection middleware");
             }
         }
 

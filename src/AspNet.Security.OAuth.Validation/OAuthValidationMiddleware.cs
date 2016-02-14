@@ -5,25 +5,26 @@
  */
 
 using System.Text.Encodings.Web;
-using Microsoft.AspNet.Authentication;
-using Microsoft.AspNet.DataProtection;
-using Microsoft.AspNet.Http;
-using Microsoft.Extensions.Internal;
+using JetBrains.Annotations;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AspNet.Security.OAuth.Validation {
     public class OAuthValidationMiddleware : AuthenticationMiddleware<OAuthValidationOptions> {
         public OAuthValidationMiddleware(
             [NotNull] RequestDelegate next,
-            [NotNull] OAuthValidationOptions options,
+            [NotNull] IOptions<OAuthValidationOptions> options,
             [NotNull] ILoggerFactory loggerFactory,
             [NotNull] UrlEncoder encoder,
             [NotNull] IDataProtectionProvider dataProtectionProvider)
             : base(next, options, loggerFactory, encoder) {
-            if (options.TicketFormat == null) {
+            if (Options.TicketFormat == null) {
                 // Note: the purposes of the default ticket
                 // format must match the values used by ASOS.
-                options.TicketFormat = new TicketDataFormat(
+                Options.TicketFormat = new TicketDataFormat(
                     dataProtectionProvider.CreateProtector(
                         "AspNet.Security.OpenIdConnect.Server.OpenIdConnectServerMiddleware",
                         "oidc-server", "Access_Token", "v1"));
