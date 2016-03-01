@@ -9,9 +9,12 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 
-namespace AspNet.Security.OAuth.Validation {
-    public class OAuthValidationOptions : AuthenticationOptions {
-        public OAuthValidationOptions() {
+namespace AspNet.Security.OAuth.Validation
+{
+    public class OAuthValidationOptions : AuthenticationOptions
+    {
+        public OAuthValidationOptions()
+        {
             AuthenticationScheme = OAuthValidationDefaults.AuthenticationScheme;
         }
 
@@ -40,5 +43,12 @@ namespace AspNet.Security.OAuth.Validation {
         /// is directly retrieved from the dependency injection container.
         /// </summary>
         public IDataProtectionProvider DataProtectionProvider { get; set; }
+
+        /// <summary>
+        /// The object provided by the application to process events raised by the validation authentication middleware.
+        /// The application may implement the interface fully, or it may create an instance of <see cref="OAuthValidationEvents"/>
+        /// and assign delegates only to the events it wants to process.
+        /// </summary>
+        public IOAuthValidationEvents Events { get; set; } = new OAuthValidationEvents();
     }
 }

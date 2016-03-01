@@ -239,6 +239,146 @@ namespace Owin.Security.OAuth.Introspection.Tests {
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         }
 
+        [Fact]
+        public async Task TokenSetToNullDuringParseAccessTokenEventCausesInvalidAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.ClientId = "Fabrikam";
+                options.ClientSecret = "B4657E03-D619";
+                options.Events = new OAuthIntrospectionEvents {
+                    OnParseAccessToken = context => {
+                        context.Token = null;
+                        return Task.FromResult(0);
+                    }
+                };
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Valid);
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task TokenSetToInvalidTokenDuringParseAccessTokenEventCausesInvalidAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.ClientId = "Fabrikam";
+                options.ClientSecret = "B4657E03-D619";
+                options.Events = new OAuthIntrospectionEvents {
+                    OnParseAccessToken = context => {
+                        context.Token = Tokens.Invalid;
+                        return Task.FromResult(0);
+                    }
+                };
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Valid);
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task TokenSetToValidTokenDuringParseAccessTokenEventAllowsSuccessfulAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.ClientId = "Fabrikam";
+                options.ClientSecret = "B4657E03-D619";
+                options.Events = new OAuthIntrospectionEvents {
+                    OnParseAccessToken = context => {
+                        context.Token = Tokens.Valid;
+                        return Task.FromResult(0);
+                    }
+                };
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Invalid);
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("Fabrikam", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task TokenValidatedEventSettingIsValidAsTrueCausesSuccessfulAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.ClientId = "Fabrikam";
+                options.ClientSecret = "B4657E03-D619";
+                options.Events = new OAuthIntrospectionEvents {
+                    OnValidateToken = context => {
+                        context.IsValid = true;
+                        return Task.FromResult(0);
+                    }
+                };
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Valid);
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("Fabrikam", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task TokenValidatedEventSettingIsValidAsFalseCausesInvalidAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.ClientId = "Fabrikam";
+                options.ClientSecret = "B4657E03-D619";
+                options.Events = new OAuthIntrospectionEvents {
+                    OnValidateToken = context => {
+                        context.IsValid = false;
+                        return Task.FromResult(0);
+                    }
+                };
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Valid);
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        private static class Tokens {
+            public const string Invalid = "invalid-token";
+            public const string Valid = "valid-token";
+            public const string SingleAudience = "valid-token-with-single-audience";
+            public const string MultipleAudiences = "valid-token-with-multiple-audiences";
+            public const string Expired = "expired-token";
+        }
+
         private static TestServer CreateResourceServer(Action<OAuthIntrospectionOptions> configuration) {
             var server = CreateAuthorizationServer();
 
@@ -294,13 +434,13 @@ namespace Owin.Security.OAuth.Introspection.Tests {
                         var form = await context.Request.ReadFormAsync();
 
                         switch (form[OAuthIntrospectionConstants.Parameters.Token]) {
-                            case "invalid-token": {
+                            case Tokens.Invalid: {
                                 payload[OAuthIntrospectionConstants.Claims.Active] = false;
 
                                 break;
                             }
 
-                            case "expired-token": {
+                            case Tokens.Expired: {
                                 payload[OAuthIntrospectionConstants.Claims.Active] = true;
                                 payload[OAuthIntrospectionConstants.Claims.Subject] = "Fabrikam";
 
@@ -310,14 +450,14 @@ namespace Owin.Security.OAuth.Introspection.Tests {
                                 break;
                             }
 
-                            case "valid-token": {
+                            case Tokens.Valid: {
                                 payload[OAuthIntrospectionConstants.Claims.Active] = true;
                                 payload[OAuthIntrospectionConstants.Claims.Subject] = "Fabrikam";
 
                                 break;
                             }
 
-                            case "valid-token-with-single-audience": {
+                            case Tokens.SingleAudience: {
                                 payload[OAuthIntrospectionConstants.Claims.Active] = true;
                                 payload[OAuthIntrospectionConstants.Claims.Subject] = "Fabrikam";
                                 payload[OAuthIntrospectionConstants.Claims.Audience] = "http://www.google.com/";
@@ -325,7 +465,7 @@ namespace Owin.Security.OAuth.Introspection.Tests {
                                 break;
                             }
 
-                            case "valid-token-with-multiple-audiences": {
+                            case Tokens.MultipleAudiences: {
                                 payload[OAuthIntrospectionConstants.Claims.Active] = true;
                                 payload[OAuthIntrospectionConstants.Claims.Subject] = "Fabrikam";
                                 payload[OAuthIntrospectionConstants.Claims.Audience] = JArray.FromObject(new[] {

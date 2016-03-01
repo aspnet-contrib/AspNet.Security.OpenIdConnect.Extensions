@@ -18,6 +18,10 @@ namespace Owin.Security.OAuth.Introspection {
             public const string Username = "username";
         }
 
+        public static class HeaderNames {
+            public const string Authorization = "Authorization";
+        }
+
         public static class Metadata {
             public const string IntrospectionEndpoint = "introspection_endpoint";
         }
@@ -25,6 +29,10 @@ namespace Owin.Security.OAuth.Introspection {
         public static class Parameters {
             public const string Token = "token";
             public const string TokenTypeHint = "token_type_hint";
+        }
+
+        public static class Properties {
+            public const string Audiences = ".audiences";
         }
 
         public static class TokenTypes {

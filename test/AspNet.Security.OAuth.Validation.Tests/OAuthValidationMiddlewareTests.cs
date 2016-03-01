@@ -32,7 +32,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "invalid-token");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Invalid);
 
             // Act
             var response = await client.SendAsync(request);
@@ -49,7 +49,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-1");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Valid);
 
             // Act
             var response = await client.SendAsync(request);
@@ -69,7 +69,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-1");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Valid);
 
             // Act
             var response = await client.SendAsync(request);
@@ -88,7 +88,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-2");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.SingleAudience);
 
             // Act
             var response = await client.SendAsync(request);
@@ -107,7 +107,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-3");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.MultipleAudiences);
 
             // Act
             var response = await client.SendAsync(request);
@@ -128,7 +128,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-2");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.SingleAudience);
 
             // Act
             var response = await client.SendAsync(request);
@@ -149,7 +149,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-3");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.MultipleAudiences);
 
             // Act
             var response = await client.SendAsync(request);
@@ -167,7 +167,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-4");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Expired);
 
             // Act
             var response = await client.SendAsync(request);
@@ -176,15 +176,145 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         }
 
+        [Fact]
+        public async Task TokenSetToNullDuringParseAccessTokenEventCausesInvalidAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.Events = new OAuthValidationEvents {
+                    OnParseAccessToken = context => {
+                        context.Token = null;
+                        return Task.FromResult(0);
+                    }
+                };
+            });
+
+            var client = server.CreateClient();
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Valid);
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task TokenSetToInvalidValueDuringParseAccessTokenEventCausesInvalidAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.Events = new OAuthValidationEvents {
+                    OnParseAccessToken = context => {
+                        context.Token = Tokens.Invalid;
+                        return Task.FromResult(0);
+                    }
+                };
+            });
+
+            var client = server.CreateClient();
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Valid);
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task TokenSetToValidValueDuringParseAccessTokenEventAllowsSuccessfulAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.Events = new OAuthValidationEvents {
+                    OnParseAccessToken = context => {
+                        context.Token = Tokens.Valid;
+                        return Task.FromResult(0);
+                    }
+                };
+            });
+
+            var client = server.CreateClient();
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Invalid);
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("Fabrikam", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task TokenValidatedEventSettingIsValidAsTrueCausesSuccessfulAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.Events = new OAuthValidationEvents {
+                    OnValidateToken = context => {
+                        context.IsValid = true;
+                        return Task.FromResult(0);
+                    }
+                };
+            });
+
+            var client = server.CreateClient();
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Valid);
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("Fabrikam", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task TokenValidatedEventSettingIsValidAsFalseCausesInvalidAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.Events = new OAuthValidationEvents {
+                    OnValidateToken = context => {
+                        context.IsValid = false;
+                        return Task.FromResult(0);
+                    }
+                };
+            });
+
+            var client = server.CreateClient();
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Valid);
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        private static class Tokens {
+            public const string Invalid = "invalid-token";
+            public const string Valid = "valid-token";
+            public const string SingleAudience = "valid-token-with-single-audience";
+            public const string MultipleAudiences = "valid-token-with-multiple-audiences";
+            public const string Expired = "expired-token";
+        }
+
         private static TestServer CreateResourceServer(Action<OAuthValidationOptions> configuration = null) {
             var builder = new WebHostBuilder();
 
-            var format = new Mock<ISecureDataFormat<AuthenticationTicket>>();
+            var format = new Mock<ISecureDataFormat<AuthenticationTicket>>(MockBehavior.Strict);
 
-            format.Setup(mock => mock.Unprotect(It.Is<string>(token => token == "invalid-token")))
+            format.Setup(mock => mock.Unprotect(It.Is<string>(token => token == Tokens.Invalid)))
                   .Returns(value: null);
 
-            format.Setup(mock => mock.Unprotect(It.Is<string>(token => token == "token-1")))
+            format.Setup(mock => mock.Unprotect(It.Is<string>(token => token == Tokens.Valid)))
                   .Returns(delegate {
                       var identity = new ClaimsIdentity(OAuthValidationDefaults.AuthenticationScheme);
                       identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, "Fabrikam"));
@@ -195,7 +325,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
                           properties, OAuthValidationDefaults.AuthenticationScheme);
                   });
 
-            format.Setup(mock => mock.Unprotect(It.Is<string>(token => token == "token-2")))
+            format.Setup(mock => mock.Unprotect(It.Is<string>(token => token == Tokens.SingleAudience)))
                   .Returns(delegate {
                       var identity = new ClaimsIdentity(OAuthValidationDefaults.AuthenticationScheme);
                       identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, "Fabrikam"));
@@ -208,7 +338,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
                           properties, OAuthValidationDefaults.AuthenticationScheme);
                   });
 
-            format.Setup(mock => mock.Unprotect(It.Is<string>(token => token == "token-3")))
+            format.Setup(mock => mock.Unprotect(It.Is<string>(token => token == Tokens.MultipleAudiences)))
                   .Returns(delegate {
                       var identity = new ClaimsIdentity(OAuthValidationDefaults.AuthenticationScheme);
                       identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, "Fabrikam"));
@@ -221,7 +351,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
                           properties, OAuthValidationDefaults.AuthenticationScheme);
                   });
 
-            format.Setup(mock => mock.Unprotect(It.Is<string>(token => token == "token-4")))
+            format.Setup(mock => mock.Unprotect(It.Is<string>(token => token == Tokens.Expired)))
                   .Returns(delegate {
                       var identity = new ClaimsIdentity(OAuthValidationDefaults.AuthenticationScheme);
                       identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, "Fabrikam"));
