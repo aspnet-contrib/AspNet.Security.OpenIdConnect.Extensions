@@ -31,12 +31,12 @@ namespace AspNet.Security.OAuth.Introspection {
 
             // Ensure that the authorization header contains the mandatory "Bearer" scheme.
             // See https://tools.ietf.org/html/rfc6750#section-2.1
-            if (!header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)) {
+            if (!header.StartsWith($"{OAuthIntrospectionDefaults.AuthenticationScheme} ", StringComparison.OrdinalIgnoreCase)) {
                 return AuthenticateResult.Fail("Authentication failed because an invalid scheme " +
                                                "was used in the 'Authorization' header.");
             }
 
-            var token = header.Substring("Bearer ".Length);
+            var token = header.Substring($"{OAuthIntrospectionDefaults.AuthenticationScheme} ".Length);
             if (string.IsNullOrWhiteSpace(token)) {
                 return AuthenticateResult.Fail("Authentication failed because the bearer token " +
                                                "was missing from the 'Authorization' header.");

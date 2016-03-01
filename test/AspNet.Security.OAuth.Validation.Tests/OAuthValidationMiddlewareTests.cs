@@ -32,7 +32,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "invalid-token");
+            request.Headers.Authorization = new AuthenticationHeaderValue(OAuthValidationDefaults.AuthenticationScheme, "invalid-token");
 
             // Act
             var response = await client.SendAsync(request);
@@ -49,7 +49,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-1");
+            request.Headers.Authorization = new AuthenticationHeaderValue(OAuthValidationDefaults.AuthenticationScheme, "token-1");
 
             // Act
             var response = await client.SendAsync(request);
@@ -69,7 +69,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-1");
+            request.Headers.Authorization = new AuthenticationHeaderValue(OAuthValidationDefaults.AuthenticationScheme, "token-1");
 
             // Act
             var response = await client.SendAsync(request);
@@ -88,7 +88,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-2");
+            request.Headers.Authorization = new AuthenticationHeaderValue(OAuthValidationDefaults.AuthenticationScheme, "token-2");
 
             // Act
             var response = await client.SendAsync(request);
@@ -107,7 +107,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-3");
+            request.Headers.Authorization = new AuthenticationHeaderValue(OAuthValidationDefaults.AuthenticationScheme, "token-3");
 
             // Act
             var response = await client.SendAsync(request);
@@ -128,7 +128,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-2");
+            request.Headers.Authorization = new AuthenticationHeaderValue(OAuthValidationDefaults.AuthenticationScheme, "token-2");
 
             // Act
             var response = await client.SendAsync(request);
@@ -149,7 +149,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-3");
+            request.Headers.Authorization = new AuthenticationHeaderValue(OAuthValidationDefaults.AuthenticationScheme, "token-3");
 
             // Act
             var response = await client.SendAsync(request);
@@ -167,7 +167,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-4");
+            request.Headers.Authorization = new AuthenticationHeaderValue(OAuthValidationDefaults.AuthenticationScheme, "token-4");
 
             // Act
             var response = await client.SendAsync(request);
