@@ -27,7 +27,7 @@ namespace AspNet.Security.OAuth.Validation {
                 Options.TicketFormat = new TicketDataFormat(
                     dataProtectionProvider.CreateProtector(
                         "AspNet.Security.OpenIdConnect.Server.OpenIdConnectServerMiddleware",
-                        "oidc-server", "Access_Token", "v1"));
+                        "ASOS", "Access_Token", "v1"));
             }
         }
 
