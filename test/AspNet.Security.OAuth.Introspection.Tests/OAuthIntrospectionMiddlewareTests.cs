@@ -76,7 +76,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "invalid-token");
+            request.Headers.Authorization = new AuthenticationHeaderValue(OAuthIntrospectionDefaults.AuthenticationScheme, "invalid-token");
 
             // Act
             var response = await client.SendAsync(request);
@@ -96,7 +96,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "valid-token");
+            request.Headers.Authorization = new AuthenticationHeaderValue(OAuthIntrospectionDefaults.AuthenticationScheme, "valid-token");
 
             // Act
             var response = await client.SendAsync(request);
@@ -118,7 +118,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "valid-token");
+            request.Headers.Authorization = new AuthenticationHeaderValue(OAuthIntrospectionDefaults.AuthenticationScheme, "valid-token");
 
             // Act
             var response = await client.SendAsync(request);
@@ -140,7 +140,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
             request.Headers.Authorization = new AuthenticationHeaderValue(
-                "Bearer", "valid-token-with-single-audience");
+                OAuthIntrospectionDefaults.AuthenticationScheme, "valid-token-with-single-audience");
 
             // Act
             var response = await client.SendAsync(request);
@@ -163,7 +163,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
             request.Headers.Authorization = new AuthenticationHeaderValue(
-                "Bearer", "valid-token-with-single-audience");
+                OAuthIntrospectionDefaults.AuthenticationScheme, "valid-token-with-single-audience");
 
             // Act
             var response = await client.SendAsync(request);
@@ -186,7 +186,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
             request.Headers.Authorization = new AuthenticationHeaderValue(
-                "Bearer", "valid-token-with-multiple-audiences");
+                OAuthIntrospectionDefaults.AuthenticationScheme, "valid-token-with-multiple-audiences");
 
             // Act
             var response = await client.SendAsync(request);
@@ -210,7 +210,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
             request.Headers.Authorization = new AuthenticationHeaderValue(
-                "Bearer", "valid-token-with-multiple-audiences");
+                OAuthIntrospectionDefaults.AuthenticationScheme, "valid-token-with-multiple-audiences");
 
             // Act
             var response = await client.SendAsync(request);
@@ -231,7 +231,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
             var client = server.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "expired-token");
+            request.Headers.Authorization = new AuthenticationHeaderValue(OAuthIntrospectionDefaults.AuthenticationScheme, "expired-token");
 
             // Act
             var response = await client.SendAsync(request);
