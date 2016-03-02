@@ -21,13 +21,6 @@
     },
 
     "frameworks": {
-        "dnx451": {
-            "dependencies": {
-                "Moq": "4.2.1312.1622",
-                "xunit.runner.console": "2.1.0"
-            }
-        },
-
         "netstandardapp1.5": {
             "dependencies": {
                 "dotnet-test-xunit": "1.0.0-dev-*",
@@ -38,6 +31,13 @@
                 "dnxcore50",
                 "portable-net451+win8"
             ]
+        },
+
+        "dnx451": {
+            "dependencies": {
+                "Moq": "4.2.1312.1622",
+                "xunit.runner.console": "2.1.0"
+            }
         }
     },
 
