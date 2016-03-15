@@ -249,7 +249,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
 
             builder.ConfigureServices(services => {
                 services.AddAuthentication();
-                services.AddCaching();
+                services.AddDistributedMemoryCache();
             });
 
             builder.Configure(app => {
@@ -284,7 +284,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests {
 
             builder.ConfigureServices(services => {
                 services.AddAuthentication();
-                services.AddCaching();
+                services.AddDistributedMemoryCache();
                 services.AddLogging();
             });
 
