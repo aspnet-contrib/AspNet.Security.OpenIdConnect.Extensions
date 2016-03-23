@@ -1,31 +1,56 @@
 {
-    "version": "1.0.0-*",
-    "description": "OAuth2 introspection middleware for ASP.NET 5",
-    "authors": [ "Kévin Chalet" ],
-    "owners": [ "Kévin Chalet" ],
+  "version": "1.0.0-alpha1-*",
 
-    "projectUrl": "https://github.com/aspnet-contrib/AspNet.Security.OAuth.Extensions",
-    "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0.html",
+  "description": "OAuth2 introspection middleware for ASP.NET Core.",
+  "authors": [ "Kévin Chalet" ],
+  "owners": [ "Kévin Chalet" ],
 
-    "dependencies": {
-        "JetBrains.Annotations": "10.1.2-eap",
-        "Microsoft.AspNetCore.Authentication": "1.0.0-*",
-        "Microsoft.Extensions.Caching.Abstractions": "1.0.0-*",
-        "Newtonsoft.Json": "8.0.2"
+  "projectUrl": "https://github.com/aspnet-contrib/AspNet.Security.OAuth.Extensions",
+  "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0.html",
+
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/aspnet-contrib/AspNet.Security.OAuth.Extensions"
+  },
+
+  "tags": [
+    "aspnetcore",
+    "authentication",
+    "jwt",
+    "openidconnect",
+    "security"
+  ],
+
+  "compilationOptions": {
+    "nowarn": [ "CS1591" ],
+    "xmlDoc": true
+  },
+
+  "dependencies": {
+    "JetBrains.Annotations": { "type": "build", "version": "10.1.2-eap" },
+    "Microsoft.AspNetCore.Authentication": "1.0.0-*",
+    "Microsoft.Extensions.Caching.Abstractions": "1.0.0-*",
+    "Newtonsoft.Json": "8.0.2"
+  },
+
+  "frameworks": {
+    "net451": {
+      "frameworkAssemblies": {
+        "System.ComponentModel": { "type": "build", "version": "4.0.0.0" },
+        "System.Runtime": { "type": "build", "version": "4.0.10.0" },
+        "System.Threading.Tasks": { "type": "build", "version": "4.0.0.0" }
+      }
     },
 
-    "frameworks": {
-        "net451": { },
+    "netstandard1.3": {
+      "dependencies": {
+        "System.Dynamic.Runtime": "4.0.11-*"
+      },
 
-        "netstandard1.3": {
-            "dependencies": {
-                "System.Dynamic.Runtime": "4.0.11-*"
-            },
-
-            "imports": [
-                "dotnet5.4",
-                "portable-net451+win8"
-            ]
-        }
+      "imports": [
+        "dotnet5.4",
+        "portable-net451+win8"
+      ]
     }
+  }
 }

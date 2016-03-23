@@ -1,49 +1,43 @@
 {
-    "authors": [ "Kévin Chalet" ],
-    "owners": [ "Kévin Chalet" ],
+  "compilationOptions": {
+    "warningsAsErrors": true
+  },
 
-    "projectUrl": "https://github.com/aspnet-contrib/AspNet.Security.OAuth.Extensions",
-    "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0.html",
+  "dependencies": {
+    "AspNet.Security.OAuth.Introspection": "1.0.0-*",
+    "Microsoft.AspNetCore.Testing": "1.0.0-*",
+    "Microsoft.AspNetCore.TestHost": "1.0.0-*",
+    "Microsoft.Extensions.Caching.Memory": "1.0.0-*",
+    "Microsoft.Extensions.Logging.Debug": "1.0.0-*",
+    "Microsoft.NETCore.Platforms": "1.0.1-*",
+    "xunit": "2.1.0",
+    "xunit.runner.aspnet": "2.0.0-aspnet-rc2-*",
 
-    "compilationOptions": {
-        "warningsAsErrors": true
+    "System.Runtime": "4.1.0-*"
+  },
+
+  "frameworks": {
+    "netstandardapp1.5": {
+      "dependencies": {
+        "dotnet-test-xunit": "1.0.0-dev-*"
+      },
+
+      "imports": [
+        "dnxcore50",
+        "portable-net451+win8"
+      ]
     },
 
-    "dependencies": {
-        "AspNet.Security.OAuth.Introspection": "1.0.0-*",
-        "Microsoft.AspNetCore.Testing": "1.0.0-*",
-        "Microsoft.AspNetCore.TestHost": "1.0.0-*",
-        "Microsoft.Extensions.Caching.Memory": "1.0.0-*",
-        "Microsoft.Extensions.Logging.Debug": "1.0.0-*",
-        "Microsoft.NETCore.Platforms": "1.0.1-*",
-        "xunit": "2.1.0",
-        "xunit.runner.aspnet": "2.0.0-aspnet-rc2-*",
-
-        "System.Runtime": "4.1.0-*"
-    },
-
-    "frameworks": {
-        "netstandardapp1.5": {
-            "dependencies": {
-                "dotnet-test-xunit": "1.0.0-dev-*"
-            },
-
-            "imports": [
-                "dnxcore50",
-                "portable-net451+win8"
-            ]
-        },
-
-        "dnx451": {
-            "dependencies": {
-                "xunit.runner.console": "2.1.0"
-            }
-        }
-    },
-
-    "testRunner": "xunit",
-
-    "commands": {
-        "test": "xunit.runner.aspnet"
+    "dnx451": {
+      "dependencies": {
+        "xunit.runner.console": "2.1.0"
+      }
     }
+  },
+
+  "testRunner": "xunit",
+
+  "commands": {
+    "test": "xunit.runner.aspnet"
+  }
 }
