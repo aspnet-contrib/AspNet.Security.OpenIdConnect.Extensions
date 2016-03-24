@@ -182,7 +182,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
         public async Task HandledResponseAfterReceivingTokenEventAllowsSuccessfulAuthentication() {
             // Arrange
             var server = CreateResourceServer(options => {
-                options.Events = new ValidationEvents {
+                options.Events = new OAuthValidationEvents {
                     OnReceivingToken = context => {
                         // Custom validation for current request
                         var authorizationHeader = context.Request.Headers[HeaderNames.Authorization];
@@ -222,7 +222,7 @@ namespace AspNet.Security.OAuth.Validation.Tests {
         public async Task SkippedResponseAfterReceivingTokenEventCausesInvalidAuthentication() {
             // Arrange
             var server = CreateResourceServer(options => {
-                options.Events = new ValidationEvents {
+                options.Events = new OAuthValidationEvents {
                     OnReceivingToken = context => {
                         // Custom failing validation for current request
                         var authorizationHeader = context.Request.Headers[HeaderNames.Authorization];

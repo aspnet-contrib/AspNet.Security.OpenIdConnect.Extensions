@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 
 namespace AspNet.Security.OAuth.Validation.Events {
-    public class ValidationEvents : IOAuthValidationEvents {
+    public class OAuthValidationEvents : IOAuthValidationEvents {
         /// <summary>
         /// Invoked if exceptions are thrown during request processing. The exceptions will be re-thrown after this event unless suppressed.
         /// </summary>
