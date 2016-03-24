@@ -21,6 +21,8 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
+using AspNet.Security.OAuth.Validation.Events;
+using Microsoft.Net.Http.Headers;
 
 namespace AspNet.Security.OAuth.Validation.Tests {
     public class OAuthValidationMiddlewareTests {
@@ -168,6 +170,74 @@ namespace AspNet.Security.OAuth.Validation.Tests {
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-4");
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task HandledResponseAfterReceivingTokenEventAllowsSuccessfulAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.Events = new ValidationEvents {
+                    OnReceivingToken = context => {
+                        // Custom validation for current request
+                        var authorizationHeader = context.Request.Headers[HeaderNames.Authorization];
+                        if (authorizationHeader == "Bearer token-42") {
+                            // Create authentication ticket
+                            var identity = new ClaimsIdentity(OAuthValidationDefaults.AuthenticationScheme);
+                            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, "CustomFabrikam"));
+
+                            var properties = new AuthenticationProperties();
+
+                            var ticket = new AuthenticationTicket(new ClaimsPrincipal(identity),
+                                properties, OAuthValidationDefaults.AuthenticationScheme);
+                            // Set ticket
+                            context.Ticket = ticket;
+                            // Mark context as resolved
+                            context.HandleResponse();
+                        }
+                        return Task.FromResult(0);
+                    }
+                };
+            });
+
+            var client = server.CreateClient();
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-42");
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("CustomFabrikam", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task SkippedResponseAfterReceivingTokenEventCausesInvalidAuthentication() {
+            // Arrange
+            var server = CreateResourceServer(options => {
+                options.Events = new ValidationEvents {
+                    OnReceivingToken = context => {
+                        // Custom failing validation for current request
+                        var authorizationHeader = context.Request.Headers[HeaderNames.Authorization];
+                        if (authorizationHeader == "Bearer token-666") {
+                            context.SkipToNextMiddleware();
+                        }
+                        return Task.FromResult(0);
+                    }
+                };
+            });
+
+            var client = server.CreateClient();
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "token-666");
 
             // Act
             var response = await client.SendAsync(request);

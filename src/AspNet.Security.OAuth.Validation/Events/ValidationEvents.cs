@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace AspNet.Security.OAuth.Validation.Events
-{
-    public class ValidationEvents : IValidationEvents
-    {
+namespace AspNet.Security.OAuth.Validation.Events {
+    public class ValidationEvents : IOAuthValidationEvents {
         /// <summary>
         /// Invoked if exceptions are thrown during request processing. The exceptions will be re-thrown after this event unless suppressed.
         /// </summary>
@@ -15,7 +13,7 @@ namespace AspNet.Security.OAuth.Validation.Events
         /// </summary>
         public Func<ReceivingTokenContext, Task> OnReceivingToken { get; set; } = context => Task.FromResult(0);
 
-        public Task AuthenticationFailed(AuthenticationFailedContext context) => OnAuthenticationFailed(context);
+        public virtual Task AuthenticationFailed(AuthenticationFailedContext context) => OnAuthenticationFailed(context);
 
         public virtual Task ReceivingToken(ReceivingTokenContext context) => OnReceivingToken(context);
     }

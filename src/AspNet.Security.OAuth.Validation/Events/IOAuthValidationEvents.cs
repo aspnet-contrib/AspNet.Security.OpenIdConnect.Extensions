@@ -2,7 +2,7 @@
 
 namespace AspNet.Security.OAuth.Validation.Events
 {
-    public interface IValidationEvents
+    public interface IOAuthValidationEvents
     {
         /// <summary>
         /// Invoked if exceptions are thrown during request processing. The exceptions will be re-thrown after this event unless suppressed.

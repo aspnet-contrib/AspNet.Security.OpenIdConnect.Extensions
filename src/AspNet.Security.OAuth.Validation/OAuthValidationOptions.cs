@@ -38,9 +38,9 @@ namespace AspNet.Security.OAuth.Validation
 
         /// <summary>
         /// The object provided by the application to process events raised by the validation authentication middleware.
-        /// The application may implement the interface fully, or it may create an instance of ValidationEvents
+        /// The application may implement the interface fully, or it may create an instance of <see cref="ValidationEvents"/>
         /// and assign delegates only to the events it wants to process.
         /// </summary>
-        public IValidationEvents Events { get; set; } = new ValidationEvents();
+        public IOAuthValidationEvents Events { get; set; } = new ValidationEvents();
     }
 }
