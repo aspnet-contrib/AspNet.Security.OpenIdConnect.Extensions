@@ -7,10 +7,14 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
+using AspNet.Security.OAuth.Validation.Events;
 
-namespace AspNet.Security.OAuth.Validation {
-    public class OAuthValidationOptions : AuthenticationOptions {
-        public OAuthValidationOptions() {
+namespace AspNet.Security.OAuth.Validation
+{
+    public class OAuthValidationOptions : AuthenticationOptions
+    {
+        public OAuthValidationOptions()
+        {
             AuthenticationScheme = OAuthValidationDefaults.AuthenticationScheme;
         }
 
@@ -31,5 +35,12 @@ namespace AspNet.Security.OAuth.Validation {
         /// authenticated tickets received by the validation middleware.
         /// </summary>
         public ISecureDataFormat<AuthenticationTicket> TicketFormat { get; set; }
+
+        /// <summary>
+        /// The object provided by the application to process events raised by the validation authentication middleware.
+        /// The application may implement the interface fully, or it may create an instance of <see cref="OAuthValidationEvents"/>
+        /// and assign delegates only to the events it wants to process.
+        /// </summary>
+        public IOAuthValidationEvents Events { get; set; } = new OAuthValidationEvents();
     }
 }
