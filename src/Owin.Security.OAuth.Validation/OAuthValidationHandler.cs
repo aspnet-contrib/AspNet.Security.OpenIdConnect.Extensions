@@ -14,26 +14,39 @@ using Microsoft.Owin.Security.Infrastructure;
 namespace Owin.Security.OAuth.Validation {
     public class OAuthValidationHandler : AuthenticationHandler<OAuthValidationOptions> {
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync() {
-            var header = Request.Headers.Get("Authorization");
-            if (string.IsNullOrEmpty(header)) {
-                Options.Logger.LogInformation("Authentication was skipped because no bearer token was received.");
+            // Give the application an opportunity to parse the token from a different location, adjust, or reject token
+            var parseAccessTokenContext = new ParseAccessTokenContext(Context, Options);
+            await Options.Events.ParseAccessToken(parseAccessTokenContext);
 
-                return null;
+            // Initialize the token from the event in case it was set during the event.
+            string token = parseAccessTokenContext.Token;
+
+            // Bypass the default processing if the event handled the request parsing.
+            if (!parseAccessTokenContext.Handled) {
+                string header = Request.Headers[OAuthValidationConstants.HeaderNames.Authorization];
+                if (string.IsNullOrWhiteSpace(header)) {
+                    Options.Logger.LogInformation("Authentication failed because the bearer token " +
+                                                   "was missing from the 'Authorization' header.");
+
+                    return null;
+                }
+
+                // Ensure that the authorization header contains the mandatory "Bearer" scheme.
+                // See https://tools.ietf.org/html/rfc6750#section-2.1
+                if (!header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)) {
+                    Options.Logger.LogInformation("Authentication failed because an invalid scheme " +
+                                                   "was used in the 'Authorization' header.");
+
+                    return null;
+                }
+
+                token = header.Substring("Bearer ".Length);
             }
 
-            // Ensure that the authorization header contains the mandatory "Bearer" scheme.
-            // See https://tools.ietf.org/html/rfc6750#section-2.1
-            if (!header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)) {
-                Options.Logger.LogInformation("Authentication was skipped because an incompatible " +
-                                              "scheme was used in the 'Authorization' header.");
-
-                return null;
-            }
-
-            var token = header.Substring("Bearer ".Length);
             if (string.IsNullOrWhiteSpace(token)) {
-                Options.Logger.LogError("Authentication failed because the bearer token " +
-                                        "was missing from the 'Authorization' header.");
+                Options.Logger.LogInformation("Authentication failed because the bearer token " +
+                                                "was missing from the request. The default location" +
+                                                "is in the 'Authorization' header.");
 
                 return null;
             }
@@ -46,6 +59,23 @@ namespace Owin.Security.OAuth.Validation {
 
                 return null;
             }
+
+            // Allow for interception and handling of the token validated event.
+            var validateTokenContext = new ValidateTokenContext(Context, Options, ticket);
+            await Options.Events.ValidateToken(validateTokenContext);
+
+            if (validateTokenContext.Handled) {
+                // Return a result based on how the validation was handled.
+                if (validateTokenContext.IsValid) {
+                    return validateTokenContext.Ticket;
+                }
+
+                Options.Logger.LogInformation("Authentication failed because the access token was not valid.");
+                return null;
+            }
+
+            // Flow any changes that were made to the ticket during the validation event.
+            ticket = validateTokenContext.Ticket;
 
             // Ensure that the access token was issued
             // to be used with this resource server.

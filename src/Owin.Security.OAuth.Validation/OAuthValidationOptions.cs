@@ -10,10 +10,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security;
 
-namespace Owin.Security.OAuth.Validation {
-    public class OAuthValidationOptions : AuthenticationOptions {
+namespace Owin.Security.OAuth.Validation
+{
+    public class OAuthValidationOptions : AuthenticationOptions
+    {
         public OAuthValidationOptions()
-            : base(OAuthValidationDefaults.AuthenticationScheme) {
+            : base(OAuthValidationDefaults.AuthenticationScheme)
+        {
         }
 
         /// <summary>
@@ -45,5 +48,12 @@ namespace Owin.Security.OAuth.Validation {
         /// data protector used by <see cref="OAuthValidationMiddleware"/>.
         /// </summary>
         public IDataProtectionProvider DataProtectionProvider { get; set; }
+        
+        /// <summary>
+        /// The object provided by the application to process events raised by the bearer authentication middleware.
+        /// The application may implement the interface fully, or it may create an instance of OAuthValidationEvents
+        /// and assign delegates only to the events it wants to process.
+        /// </summary>
+        public IOAuthValidationEvents Events { get; set; } = new OAuthValidationEvents();
     }
 }

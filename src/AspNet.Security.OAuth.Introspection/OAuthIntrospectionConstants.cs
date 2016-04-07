@@ -27,6 +27,10 @@ namespace AspNet.Security.OAuth.Introspection {
             public const string TokenTypeHint = "token_type_hint";
         }
 
+        public static class Properties {
+            public const string Audiences = ".audiences";
+        }
+
         public static class TokenTypes {
             public const string AccessToken = "access_token";
         }
