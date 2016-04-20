@@ -286,6 +286,13 @@ namespace AspNet.Security.OAuth.Introspection {
                         continue;
                     }
 
+                    //Add the token/ticket identifier as a property on the AuthenticationTicket.
+                    case OAuthIntrospectionConstants.Claims.Jti: {
+                        properties.Items[OAuthIntrospectionConstants.Properties.TicketId] = property.Value<string>();
+
+                        continue;
+                    }
+
                     // Extract the scope values from the space-delimited
                     // "scope" claim and store them as individual claims.
                     // See https://tools.ietf.org/html/rfc7662#section-2.2
