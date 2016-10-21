@@ -39,7 +39,8 @@ namespace AspNet.Security.OAuth.Validation {
         }
 
         protected override AuthenticationHandler<OAuthValidationOptions> CreateHandler() {
-            return new OAuthValidationHandler();
+            var instance = Options.Handler?.Invoke();
+            return instance ?? new OAuthValidationHandler();
         }
     }
 }
