@@ -74,11 +74,6 @@ namespace AspNet.Security.OAuth.Introspection {
         public HttpClient HttpClient { get; set; } = new HttpClient();
 
         /// <summary>
-        /// Gets or sets the clock used to determine the current date/time.
-        /// </summary>
-        public ISystemClock SystemClock { get; set; } = new SystemClock();
-
-        /// <summary>
         /// Gets or sets the data format used to serialize and deserialize
         /// the authenticated tickets stored in the distributed cache.
         /// </summary>
