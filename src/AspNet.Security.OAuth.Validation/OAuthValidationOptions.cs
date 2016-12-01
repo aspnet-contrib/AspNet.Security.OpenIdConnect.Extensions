@@ -32,11 +32,6 @@ namespace AspNet.Security.OAuth.Validation {
         public bool SaveToken { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets the clock used to determine the current date/time.
-        /// </summary>
-        public ISystemClock SystemClock { get; set; } = new SystemClock();
-
-        /// <summary>
         /// Gets or sets the data format used to unprotect the
         /// access tokens received by the validation middleware.
         /// </summary>
