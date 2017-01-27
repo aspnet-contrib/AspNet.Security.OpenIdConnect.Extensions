@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Authentication;
+using System;
 
 namespace AspNet.Security.OAuth.Validation {
     public class OAuthValidationOptions : AuthenticationOptions {
@@ -56,5 +57,10 @@ namespace AspNet.Security.OAuth.Validation {
         /// <see cref="OAuthValidationEvents"/> and assign delegates only to the events it wants to process.
         /// </summary>
         public OAuthValidationEvents Events { get; set; } = new OAuthValidationEvents();
+
+        /// <summary>
+        /// Allow to use custom Validation Handler. For example to override HandleUnauthorizedAsync and customize response.
+        /// </summary>
+        public Func<AuthenticationHandler<OAuthValidationOptions>> Handler { get; set; }
     }
 }
