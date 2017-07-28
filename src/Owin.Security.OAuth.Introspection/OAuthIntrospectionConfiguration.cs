@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Newtonsoft.Json;
 
 namespace Owin.Security.OAuth.Introspection
@@ -31,10 +32,7 @@ namespace Owin.Security.OAuth.Introspection
         /// </summary>
         /// <param name="json">The JSON payload used to initialize the current instance.</param>
         public OAuthIntrospectionConfiguration([NotNull] string json)
-            : base(json)
-        {
-            JsonConvert.PopulateObject(json, this);
-        }
+            : base(json) { }
 
         /// <summary>
         /// Gets or sets the introspection endpoint address.

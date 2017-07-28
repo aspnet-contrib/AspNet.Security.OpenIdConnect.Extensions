@@ -141,11 +141,9 @@ namespace Owin.Security.OAuth.Introspection
                                                     "'RequireHttpsMetadata' is not set to 'false'.", nameof(options));
                     }
 
-                    Options.ConfigurationManager = new ConfigurationManager<OAuthIntrospectionConfiguration>(
-                        Options.MetadataAddress.AbsoluteUri, new OAuthIntrospectionConfiguration.Retriever(),
-                        (IDocumentRetriever) Activator.CreateInstance(
-                            type: typeof(OpenIdConnectConfiguration).Assembly.GetType("Microsoft.IdentityModel.Protocols.HttpDocumentRetriever"),
-                            args: Options.HttpClient));
+                    options.ConfigurationManager = new ConfigurationManager<OAuthIntrospectionConfiguration>(
+                        options.MetadataAddress.AbsoluteUri, new OAuthIntrospectionConfiguration.Retriever(),
+                        new HttpDocumentRetriever(options.HttpClient) { RequireHttps = options.RequireHttpsMetadata });
                 }
             }
         }
