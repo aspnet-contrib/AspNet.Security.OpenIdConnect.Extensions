@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Authentication;
 
 namespace AspNet.Security.OAuth.Introspection
 {
-    public class OAuthClaimTransformer : IClaimsTransformation
+    public class OAuthClaimsTransformer : IClaimsTransformation
     {
         private readonly string _schema;
         private readonly OAuthIntrospectionOptions _options;
 
-        public OAuthClaimTransformer(string schema, OAuthIntrospectionOptions options)
+        public OAuthClaimsTransformer(string schema, OAuthIntrospectionOptions options)
         {
             _schema = schema;
             _options = options;

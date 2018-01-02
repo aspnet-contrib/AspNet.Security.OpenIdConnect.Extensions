@@ -35,8 +35,8 @@ namespace AspNet.Security.OAuth.Introspection.Tests
                 && claim.Type == incommingClaim.Type
                 && claim.Issuer == claimsIssuer.ToString());
         }
-        private static OAuthClaimTransformer CreateSut(string schema, Uri claimsIssuer) =>
-            new OAuthClaimTransformer(schema, new OAuthIntrospectionOptions
+        private static OAuthClaimsTransformer CreateSut(string schema, Uri claimsIssuer) =>
+            new OAuthClaimsTransformer(schema, new OAuthIntrospectionOptions
         {
             ClaimsIssuer =  claimsIssuer?.ToString(),
             Authority = claimsIssuer

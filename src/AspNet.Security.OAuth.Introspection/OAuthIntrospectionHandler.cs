@@ -518,8 +518,6 @@ namespace AspNet.Security.OAuth.Introspection
             return false;
         }
 
-        private Claim CreateClaimWithClaimsIssuer(string type, string scope) => new Claim(type, scope, ClaimValueTypes.String, ClaimsIssuer);
-        private Claim CreateClaim(string type, string scope) => new Claim(type, scope);
         private async Task<AuthenticateResult> CreateTicketAsync(string token, JObject payload)
         {
             var identity = new ClaimsIdentity(Scheme.Name, Options.NameClaimType, Options.RoleClaimType);
@@ -643,13 +641,9 @@ namespace AspNet.Security.OAuth.Introspection
                             new JArray(scopes).ToString(Formatting.None);
 
                             // For convenience, also store the scopes as individual claims.
-                        var hasIssuer = !string.IsNullOrEmpty(ClaimsIssuer);
                         foreach (var scope in scopes)
                         {
-                            var claim = hasIssuer 
-                                    ? CreateClaimWithClaimsIssuer(property.Name, scope) 
-                                    : CreateClaim(property.Name, scope);
-                            identity.AddClaim(claim);
+                           identity.AddClaim(new Claim(property.Name, scope));
                         }
                         continue;
                     }

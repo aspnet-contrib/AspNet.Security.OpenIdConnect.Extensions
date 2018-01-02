@@ -88,7 +88,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 ServiceDescriptor.Singleton<IPostConfigureOptions<OAuthIntrospectionOptions>,
                                             OAuthIntrospectionInitializer>());
             if(HasClaimIssuer(configuration))
-                builder.Services.AddTransient<IClaimsTransformation, OAuthClaimTransformer>();
+                builder.Services.AddTransient<IClaimsTransformation, OAuthClaimsTransformer>();
 
             return builder.AddScheme<OAuthIntrospectionOptions, OAuthIntrospectionHandler>(scheme, configuration);
         }
