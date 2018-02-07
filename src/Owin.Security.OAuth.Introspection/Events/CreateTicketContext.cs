@@ -7,7 +7,7 @@
 using JetBrains.Annotations;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Notifications;
+using Microsoft.Owin.Security.Provider;
 using Newtonsoft.Json.Linq;
 
 namespace Owin.Security.OAuth.Introspection
@@ -15,7 +15,7 @@ namespace Owin.Security.OAuth.Introspection
     /// <summary>
     /// Allows interception of the AuthenticationTicket creation process.
     /// </summary>
-    public class CreateTicketContext : BaseNotification<OAuthIntrospectionOptions>
+    public class CreateTicketContext : BaseContext<OAuthIntrospectionOptions>
     {
         public CreateTicketContext(
             [NotNull] IOwinContext context,

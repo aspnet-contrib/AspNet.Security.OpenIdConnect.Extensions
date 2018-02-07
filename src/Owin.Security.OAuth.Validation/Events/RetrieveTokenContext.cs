@@ -7,14 +7,14 @@
 using JetBrains.Annotations;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Notifications;
+using Microsoft.Owin.Security.Provider;
 
 namespace Owin.Security.OAuth.Validation
 {
     /// <summary>
     /// Allows custom parsing of access tokens from requests.
     /// </summary>
-    public class RetrieveTokenContext : BaseNotification<OAuthValidationOptions>
+    public class RetrieveTokenContext : BaseContext<OAuthValidationOptions>
     {
         public RetrieveTokenContext(
             [NotNull] IOwinContext context,
@@ -32,5 +32,25 @@ namespace Owin.Security.OAuth.Validation
         /// Gets or sets the <see cref="AuthenticationTicket"/> created by the application.
         /// </summary>
         public AuthenticationTicket Ticket { get; set; }
+
+        /// <summary>
+        /// Gets a boolean indicating if the operation was handled from user code.
+        /// </summary>
+        public bool Handled { get; private set; }
+
+        /// <summary>
+        /// Marks the operation as handled to prevent the default logic from being applied.
+        /// </summary>
+        public void HandleValidation() => Handled = true;
+
+        /// <summary>
+        /// Marks the operation as handled to prevent the default logic from being applied.
+        /// </summary>
+        /// <param name="ticket">The authentication ticket to use.</param>
+        public void HandleValidation(AuthenticationTicket ticket)
+        {
+            Ticket = ticket;
+            Handled = true;
+        }
     }
 }

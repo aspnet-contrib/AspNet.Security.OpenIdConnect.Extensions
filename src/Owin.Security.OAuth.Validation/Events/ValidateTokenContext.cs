@@ -7,14 +7,14 @@
 using JetBrains.Annotations;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Notifications;
+using Microsoft.Owin.Security.Provider;
 
 namespace Owin.Security.OAuth.Validation
 {
     /// <summary>
     /// Allows customization of the token validation logic.
     /// </summary>
-    public class ValidateTokenContext : BaseNotification<OAuthValidationOptions>
+    public class ValidateTokenContext : BaseContext<OAuthValidationOptions>
     {
         public ValidateTokenContext(
             [NotNull] IOwinContext context,

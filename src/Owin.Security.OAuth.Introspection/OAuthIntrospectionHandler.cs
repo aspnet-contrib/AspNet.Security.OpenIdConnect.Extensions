@@ -32,25 +32,11 @@ namespace Owin.Security.OAuth.Introspection
             var context = new RetrieveTokenContext(Context, Options);
             await Options.Events.RetrieveToken(context);
 
-            if (context.HandledResponse)
+            if (context.Handled)
             {
-                // If no ticket has been provided, return a failed result to
-                // indicate that authentication was rejected by application code.
-                if (context.Ticket == null)
-                {
-                    Logger.LogInformation("Authentication was stopped by application code.");
-
-                    return null;
-                }
+                Logger.LogInformation("The default authentication handling was skipped from user code.");
 
                 return context.Ticket;
-            }
-
-            else if (context.Skipped)
-            {
-                Logger.LogInformation("Authentication was skipped by application code.");
-
-                return null;
             }
 
             var token = context.Token;
@@ -166,27 +152,6 @@ namespace Owin.Security.OAuth.Introspection
             var notification = new ValidateTokenContext(Context, Options, ticket);
             await Options.Events.ValidateToken(notification);
 
-            if (notification.HandledResponse)
-            {
-                // If no ticket has been provided, return a failed result to
-                // indicate that authentication was rejected by application code.
-                if (notification.Ticket == null)
-                {
-                    Logger.LogInformation("Authentication was stopped by application code.");
-
-                    return null;
-                }
-
-                return notification.Ticket;
-            }
-
-            else if (notification.Skipped)
-            {
-                Logger.LogInformation("Authentication was skipped by application code.");
-
-                return null;
-            }
-
             // Allow the application code to replace the ticket
             // reference from the ValidateToken event.
             return notification.Ticket;
@@ -263,7 +228,7 @@ namespace Owin.Security.OAuth.Introspection
 
             await Options.Events.ApplyChallenge(notification);
 
-            if (notification.HandledResponse || notification.Skipped)
+            if (notification.Handled)
             {
                 return;
             }
@@ -368,7 +333,7 @@ namespace Owin.Security.OAuth.Introspection
 
         private async Task<JObject> GetIntrospectionPayloadAsync(string token)
         {
-            var configuration = await Options.ConfigurationManager.GetConfigurationAsync(Request.CallCancelled);
+            var configuration = await Options.ConfigurationManager.GetConfigurationAsync(default);
             if (configuration == null)
             {
                 throw new InvalidOperationException("The OAuth2 introspection middleware was unable to retrieve " +
@@ -418,32 +383,17 @@ namespace Owin.Security.OAuth.Introspection
             var notification = new SendIntrospectionRequestContext(Context, Options, request, token);
             await Options.Events.SendIntrospectionRequest(notification);
 
-            HttpResponseMessage response = null;
-
-            if (notification.HandledResponse)
+            if (notification.Handled)
             {
-                // If no response has been provided, return a failed result to
-                // indicate that authentication was rejected by application code.
-                if (notification.Response == null)
-                {
-                    Logger.LogInformation("Authentication was stopped by application code.");
-
-                    return null;
-                }
-
-                response = notification.Response;
-            }
-
-            else if (notification.Skipped)
-            {
-                Logger.LogInformation("Authentication was skipped by application code.");
+                Logger.LogInformation("The default challenge handling was skipped from user code.");
 
                 return null;
             }
 
+            var response = notification.Response;
             if (response == null)
             {
-                response = await Options.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Request.CallCancelled);
+                response = await Options.HttpClient.SendAsync(request);
             }
 
             if (!response.IsSuccessStatusCode)
@@ -480,8 +430,7 @@ namespace Owin.Security.OAuth.Introspection
                                                   exception is JsonReaderException ||
                                                   exception is JsonSerializationException)
                 {
-                    Logger.LogError("An error occurred while deserializing the " +
-                                    "introspection response: {Exception}.", exception);
+                    Logger.LogError(exception, "An error occurred while deserializing the introspection response.");
 
                     return null;
                 }
@@ -779,23 +728,6 @@ namespace Owin.Security.OAuth.Introspection
 
             var notification = new CreateTicketContext(Context, Options, ticket, payload);
             await Options.Events.CreateTicket(notification);
-
-            if (notification.HandledResponse)
-            {
-                // If no ticket has been provided, return a failed result to
-                // indicate that authentication was rejected by application code.
-                if (notification.Ticket == null)
-                {
-                    return null;
-                }
-
-                return notification.Ticket;
-            }
-
-            else if (notification.Skipped)
-            {
-                return null;
-            }
 
             return notification.Ticket;
         }

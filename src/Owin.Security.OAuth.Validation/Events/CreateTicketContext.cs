@@ -7,14 +7,14 @@
 using JetBrains.Annotations;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Notifications;
+using Microsoft.Owin.Security.Provider;
 
 namespace Owin.Security.OAuth.Validation
 {
     /// <summary>
     /// Allows interception of the AuthenticationTicket creation process.
     /// </summary>
-    public class CreateTicketContext : BaseNotification<OAuthValidationOptions>
+    public class CreateTicketContext : BaseContext<OAuthValidationOptions>
     {
         public CreateTicketContext(
             [NotNull] IOwinContext context,

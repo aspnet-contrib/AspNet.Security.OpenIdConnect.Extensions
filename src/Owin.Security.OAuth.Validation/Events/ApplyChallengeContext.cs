@@ -7,14 +7,14 @@
 using JetBrains.Annotations;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Notifications;
+using Microsoft.Owin.Security.Provider;
 
 namespace Owin.Security.OAuth.Validation
 {
     /// <summary>
     /// Allows customization of the challenge process.
     /// </summary>
-    public class ApplyChallengeContext : BaseNotification<OAuthValidationOptions>
+    public class ApplyChallengeContext : BaseContext<OAuthValidationOptions>
     {
         public ApplyChallengeContext(
             [NotNull] IOwinContext context,
@@ -61,5 +61,15 @@ namespace Owin.Security.OAuth.Validation
         /// the caller as part of the WWW-Authenticate header.
         /// </summary>
         public string Scope { get; set; }
+
+        /// <summary>
+        /// Gets a boolean indicating if the operation was handled from user code.
+        /// </summary>
+        public bool Handled { get; private set; }
+
+        /// <summary>
+        /// Marks the operation as handled to prevent the default logic from being applied.
+        /// </summary>
+        public void HandleResponse() => Handled = true;
     }
 }

@@ -371,7 +371,7 @@ namespace AspNet.Security.OAuth.Introspection
 
         private async Task<JObject> GetIntrospectionPayloadAsync(string token)
         {
-            var configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.RequestAborted);
+            var configuration = await Options.ConfigurationManager.GetConfigurationAsync(default);
             if (configuration == null)
             {
                 throw new InvalidOperationException("The OAuth2 introspection middleware was unable to retrieve " +
@@ -431,7 +431,7 @@ namespace AspNet.Security.OAuth.Introspection
             var response = notification.Response;
             if (response == null)
             {
-                response = await Options.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
+                response = await Options.HttpClient.SendAsync(request);
             }
 
             if (!response.IsSuccessStatusCode)
@@ -468,7 +468,7 @@ namespace AspNet.Security.OAuth.Introspection
                                                   exception is JsonReaderException ||
                                                   exception is JsonSerializationException)
                 {
-                    Logger.LogError("An error occurred while deserializing the introspection response: {Exception}.", exception);
+                    Logger.LogError(exception, "An error occurred while deserializing the introspection response.");
 
                     return null;
                 }

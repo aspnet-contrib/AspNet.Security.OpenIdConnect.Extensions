@@ -25,25 +25,11 @@ namespace Owin.Security.OAuth.Validation
             var context = new RetrieveTokenContext(Context, Options);
             await Options.Events.RetrieveToken(context);
 
-            if (context.HandledResponse)
+            if (context.Handled)
             {
-                // If no ticket has been provided, return a failed result to
-                // indicate that authentication was rejected by application code.
-                if (context.Ticket == null)
-                {
-                    Logger.LogInformation("Authentication was stopped by application code.");
-
-                    return null;
-                }
+                Logger.LogInformation("The default authentication handling was skipped from user code.");
 
                 return context.Ticket;
-            }
-
-            else if (context.Skipped)
-            {
-                Logger.LogInformation("Authentication was skipped by application code.");
-
-                return null;
             }
 
             var token = context.Token;
@@ -131,27 +117,6 @@ namespace Owin.Security.OAuth.Validation
             var notification = new ValidateTokenContext(Context, Options, ticket);
             await Options.Events.ValidateToken(notification);
 
-            if (notification.HandledResponse)
-            {
-                // If no ticket has been provided, return a failed result to
-                // indicate that authentication was rejected by application code.
-                if (notification.Ticket == null)
-                {
-                    Logger.LogInformation("Authentication was stopped by application code.");
-
-                    return null;
-                }
-
-                return notification.Ticket;
-            }
-
-            else if (notification.Skipped)
-            {
-                Logger.LogInformation("Authentication was skipped by application code.");
-
-                return null;
-            }
-
             // Allow the application code to replace the ticket
             // reference from the ValidateToken event.
             return notification.Ticket;
@@ -228,7 +193,7 @@ namespace Owin.Security.OAuth.Validation
 
             await Options.Events.ApplyChallenge(notification);
 
-            if (notification.HandledResponse || notification.Skipped)
+            if (notification.Handled)
             {
                 return;
             }
@@ -386,23 +351,6 @@ namespace Owin.Security.OAuth.Validation
 
             var notification = new CreateTicketContext(Context, Options, ticket);
             await Options.Events.CreateTicket(notification);
-
-            if (notification.HandledResponse)
-            {
-                // If no ticket has been provided, return a failed result to
-                // indicate that authentication was rejected by application code.
-                if (notification.Ticket == null)
-                {
-                    return null;
-                }
-
-                return notification.Ticket;
-            }
-
-            else if (notification.Skipped)
-            {
-                return null;
-            }
 
             return notification.Ticket;
         }
