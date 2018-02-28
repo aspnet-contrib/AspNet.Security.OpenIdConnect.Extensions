@@ -3,6 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{2CFA7432-2FA7-4CF3-87DC-217C1363E11D}"
+	ProjectSection(SolutionItems) = preProject
+		build\common.props = build\common.props
+		build\dependencies.props = build\dependencies.props
+		build\key.snk = build\key.snk
+		build\packages.props = build\packages.props
+		build\repo.props = build\repo.props
+		build\tests.props = build\tests.props
+		build\version.props = build\version.props
+	EndProjectSection
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7AADF737-9B13-4E5C-8F32-8BF21429E093}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{2B1B08E0-E9A3-40C0-B200-DE09952AF0E7}"
@@ -74,5 +85,8 @@ Global
 		{A6B08CB3-0B3E-444D-BCF1-E9E41CEEC984} = {2B1B08E0-E9A3-40C0-B200-DE09952AF0E7}
 		{719AF040-773B-4DA5-B53E-28B26D1121FF} = {7AADF737-9B13-4E5C-8F32-8BF21429E093}
 		{6DC60DCF-B34B-4F14-9E73-BE466059A9B2} = {2B1B08E0-E9A3-40C0-B200-DE09952AF0E7}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7DD610CB-5D2D-4AEB-B5D3-4DEEB694AA36}
 	EndGlobalSection
 EndGlobal
