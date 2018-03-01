@@ -640,12 +640,11 @@ namespace AspNet.Security.OAuth.Introspection
                         properties.Items[OAuthIntrospectionConstants.Properties.Scopes] =
                             new JArray(scopes).ToString(Formatting.None);
 
-                        // For convenience, also store the scopes as individual claims.
+                            // For convenience, also store the scopes as individual claims.
                         foreach (var scope in scopes)
                         {
-                            identity.AddClaim(new Claim(property.Name, scope));
+                           identity.AddClaim(new Claim(property.Name, scope));
                         }
-
                         continue;
                     }
 

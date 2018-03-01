@@ -87,8 +87,18 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.TryAddEnumerable(
                 ServiceDescriptor.Singleton<IPostConfigureOptions<OAuthIntrospectionOptions>,
                                             OAuthIntrospectionInitializer>());
+            if(HasClaimIssuer(configuration))
+                builder.Services.AddTransient<IClaimsTransformation, OAuthClaimsTransformer>();
 
             return builder.AddScheme<OAuthIntrospectionOptions, OAuthIntrospectionHandler>(scheme, configuration);
+        }
+
+        private static bool HasClaimIssuer(Action<OAuthIntrospectionOptions> configuration)
+        {
+            var oAuthIntrospectionOptions = new OAuthIntrospectionOptions();
+            configuration(oAuthIntrospectionOptions);
+
+            return !string.IsNullOrEmpty(oAuthIntrospectionOptions.ClaimsIssuer);
         }
     }
 }
