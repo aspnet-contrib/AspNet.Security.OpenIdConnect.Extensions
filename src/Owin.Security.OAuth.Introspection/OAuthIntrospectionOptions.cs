@@ -139,6 +139,35 @@ namespace Owin.Security.OAuth.Introspection
         public OAuthIntrospectionEvents Events { get; set; } = new OAuthIntrospectionEvents();
 
         /// <summary>
+        /// Copy Http Headers that match the provided values from the request being authenticated to the Introspection request.
+        /// </summary>
+        /// <param name="exactMatches">List of strings that are matched to the Http Headers exactly.</param>
+        /// <param name="prefixes">List of strings that Http Headers are compared to, e.g. "X-" for X-Forwarded or X-Correlation-Id.</param>
+        public void SetValuesToMatchFromRequestHttpHeaders(string[] exactMatches, string[] prefixes)
+        {
+            IncludeHttpHeadersFromRequest = (exactMatches?.Length > 0 || prefixes?.Length > 0);
+
+            MatchingHttpHeadersPrefixes = prefixes ?? new string[0];
+            MatchingHttpHeadersExact = exactMatches ?? new string[0];
+        }
+
+        /// <summary>
+        /// Property that returns whether matching Http Headers will be copied or not.  To set
+        /// this property to false, call method SetValuesToMatchFromRequestHttpHeaders with an empty string.
+        /// </summary>
+        public bool IncludeHttpHeadersFromRequest { get; private set; }
+
+        /// <summary>
+        /// Property that returns the prefix to use to match Http Headers.
+        /// </summary>
+        public string[] MatchingHttpHeadersPrefixes { get; private set; }
+
+        /// <summary>
+        /// Property that returns the exatc matches to use when matching Http Headers.
+        /// </summary>
+        public string[] MatchingHttpHeadersExact { get; private set; }
+
+        /// <summary>
         /// Gets or sets the HTTP client used to communicate with the remote OAuth2 server.
         /// </summary>
         public HttpClient HttpClient { get; set; }
