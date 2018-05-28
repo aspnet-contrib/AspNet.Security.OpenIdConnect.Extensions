@@ -607,6 +607,310 @@ namespace Owin.Security.OAuth.Introspection.Tests
             Assert.Equal(header, response.Headers.WwwAuthenticate.ToString());
         }
 
+        [Fact]
+        public async Task HandleAuthenticateAsync_CopyMatchingHttpHeaders_NotSet()
+        {
+            // Arrange
+            var correlationId = Guid.NewGuid().ToString();
+            var forwardedFor = "1.1.1.1";
+            var xCorrelationId = "X-Correlation-Id";
+            var xForwardedFor = "X-Forwarded-For";
+            var someHttpHeader = "Some-Http-Header";
+
+            var server = CreateResourceServer(options =>
+            {
+                options.Events.OnSendIntrospectionRequest = context =>
+                {
+                    // Assert
+                    var headers = context.Request.Headers;
+                    var keys = headers.Select(x => x.Key).ToArray();
+
+                    Assert.DoesNotContain(new[] { xCorrelationId, xForwardedFor, someHttpHeader }, (x => keys.Contains(x)));
+
+                    return Task.FromResult(0);
+                };
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "valid-token");
+            request.Headers.Add(xCorrelationId, new List<string> { correlationId });
+            request.Headers.Add(xForwardedFor, new List<string> { forwardedFor });
+            request.Headers.Add(someHttpHeader, new List<string> { "header-value" });
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task HandleAuthenticateAsync_CopyMatchingHttpHeaders_DoesNotContainNonMatchedHeaders()
+        {
+            // Arrange
+            var correlationId = Guid.NewGuid().ToString();
+            var forwardedFor = "1.1.1.1";
+            var xCorrelationId = "X-Correlation-Id";
+            var xForwardedFor = "X-Forwarded-For";
+            var someHttpHeader = "Some-Http-Header";
+
+            var server = CreateResourceServer(options =>
+            {
+                options.SetValuesToMatchFromRequestHttpHeaders(null, new[] { "X-" });
+                options.Events.OnSendIntrospectionRequest = context =>
+                {
+                    // Assert
+                    var headers = context.Request.Headers;
+                    var keys = headers.Select(x => x.Key).ToArray();
+
+                    Assert.DoesNotContain(new[] { someHttpHeader }, (x => keys.Contains(x)));
+
+                    return Task.FromResult(0);
+                };
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "valid-token");
+            request.Headers.Add(xCorrelationId, new List<string> { correlationId });
+            request.Headers.Add(xForwardedFor, new List<string> { forwardedFor });
+            request.Headers.Add(someHttpHeader, new List<string> { "header-value" });
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task HandleAuthenticateAsync_CopyMatchingHttpHeaders_UsingMulitplePrefixes()
+        {
+            // Arrange
+            var correlationId = Guid.NewGuid().ToString();
+            var forwardedFor = "1.1.1.1";
+            var headerPrefixX = "X-";
+            var headerPrefixY = "Y-";
+            var xCorrelationId = "X-Correlation-Id";
+            var xForwardedFor = "Y-Forwarded-For";
+            var someHttpHeader = "Some-Http-Header";
+
+            var server = CreateResourceServer(options =>
+            {
+                options.SetValuesToMatchFromRequestHttpHeaders(null, new[] { headerPrefixX, headerPrefixY });
+                options.Events.OnSendIntrospectionRequest = context =>
+                {
+                    // Assert
+                    var headers = context.Request.Headers;
+                    var keys = headers.Select(x => x.Key).ToArray();
+
+                    Assert.Contains(new[] { xCorrelationId, xForwardedFor }, (x => keys.Contains(x)));
+                    Assert.Contains(correlationId, headers.Single(x => x.Key.Equals(xCorrelationId, StringComparison.Ordinal)).Value);
+                    Assert.Contains(forwardedFor, headers.Single(x => x.Key.Equals(xForwardedFor, StringComparison.Ordinal)).Value);
+
+                    return Task.FromResult(0);
+                };
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "valid-token");
+            request.Headers.Add(xCorrelationId, new List<string> { correlationId });
+            request.Headers.Add(xForwardedFor, new List<string> { forwardedFor });
+            request.Headers.Add(someHttpHeader, new List<string> { "header-value" });
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task HandleAuthenticateAsync_CopyMatchingHttpHeaders_UsingSinglePrefix()
+        {
+            // Arrange
+            var correlationId = Guid.NewGuid().ToString();
+            var forwardedFor = "1.1.1.1";
+            var xCorrelationId = "X-Correlation-Id";
+            var xForwardedFor = "X-Forwarded-For";
+            var headerPrefix = "X-";
+
+            var server = CreateResourceServer(options =>
+            {
+                options.SetValuesToMatchFromRequestHttpHeaders(null, new[] { headerPrefix });
+                options.Events.OnSendIntrospectionRequest = context =>
+                {
+                    // Assert
+                    var headers = context.Request.Headers;
+                    var keys = headers.Select(x => x.Key).ToArray();
+
+                    Assert.Contains(new[] { xCorrelationId, xForwardedFor }, (x => keys.Contains(x)));
+                    Assert.Contains(correlationId, headers.Single(x => x.Key.Equals(xCorrelationId, StringComparison.Ordinal)).Value);
+                    Assert.Contains(forwardedFor, headers.Single(x => x.Key.Equals(xForwardedFor, StringComparison.Ordinal)).Value);
+
+                    return Task.FromResult(0);
+                };
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "valid-token");
+            request.Headers.Add(xCorrelationId, new List<string> { correlationId });
+            request.Headers.Add(xForwardedFor, new List<string> { forwardedFor });
+            request.Headers.Add("Some-Http-Header", new List<string> { "header-value" });
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task HandleAuthenticateAsync_CopyMatchingHttpHeaders_UsingSingleExactMatch()
+        {
+            // Arrange
+            var correlationId = Guid.NewGuid().ToString();
+            var forwardedFor = "1.1.1.1";
+            var xCorrelationId = "X-Correlation-Id";
+            var xForwardedFor = "X-Forwarded-For";
+
+            var server = CreateResourceServer(options =>
+            {
+                options.SetValuesToMatchFromRequestHttpHeaders(new[] { xCorrelationId }, null);
+                options.Events.OnSendIntrospectionRequest = context =>
+                {
+                    // Assert
+                    var headers = context.Request.Headers;
+                    var keys = headers.Select(x => x.Key).ToArray();
+
+                    Assert.Contains(new[] { xCorrelationId }, (x => keys.Contains(x)));
+                    Assert.Contains(correlationId, headers.Single(x => x.Key.Equals(xCorrelationId, StringComparison.Ordinal)).Value);
+
+                    return Task.FromResult(0);
+                };
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "valid-token");
+            request.Headers.Add(xCorrelationId, new List<string> { correlationId });
+            request.Headers.Add(xForwardedFor, new List<string> { forwardedFor });
+            request.Headers.Add("Some-Http-Header", new List<string> { "header-value" });
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task HandleAuthenticateAsync_CopyMatchingHttpHeaders_UsingMultipleExactMatches()
+        {
+            // Arrange
+            var correlationId = Guid.NewGuid().ToString();
+            var forwardedFor = "1.1.1.1";
+            var xCorrelationId = "X-Correlation-Id";
+            var xForwardedFor = "X-Forwarded-For";
+
+            var server = CreateResourceServer(options =>
+            {
+                options.SetValuesToMatchFromRequestHttpHeaders(new[] { xCorrelationId, xForwardedFor }, null);
+                options.Events.OnSendIntrospectionRequest = context =>
+                {
+                    // Assert
+                    var headers = context.Request.Headers;
+                    var keys = headers.Select(x => x.Key).ToArray();
+
+                    Assert.Contains(new[] { xCorrelationId, xForwardedFor }, (x => keys.Contains(x)));
+                    Assert.Contains(correlationId, headers.Single(x => x.Key.Equals(xCorrelationId, StringComparison.Ordinal)).Value);
+                    Assert.Contains(forwardedFor, headers.Single(x => x.Key.Equals(xForwardedFor, StringComparison.Ordinal)).Value);
+
+                    return Task.FromResult(0);
+                };
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "valid-token");
+            request.Headers.Add(xCorrelationId, new List<string> { correlationId });
+            request.Headers.Add(xForwardedFor, new List<string> { forwardedFor });
+            request.Headers.Add("Some-Http-Header", new List<string> { "header-value" });
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task HandleAuthenticateAsync_CopyMatchingHttpHeaders_UsingExactAndPrefixMatches()
+        {
+            // Arrange
+            var correlationId = Guid.NewGuid().ToString();
+            var forwardedFor = "1.1.1.1";
+            var xCorrelationId = "X-Correlation-Id";
+            var xForwardedFor = "X-Forwarded-For";
+            var aHttpHeader = "A-SomeHeader";
+            var aNotherHeader = "A-NotherHeader";
+            var headerPrefixA = "A-";
+            var ahttpHeaderVal = "header-value";
+            var aNotherHeaderVal = "another-header-value";
+
+            var server = CreateResourceServer(options =>
+            {
+                options.SetValuesToMatchFromRequestHttpHeaders(new[] { xCorrelationId, xForwardedFor }, new[] { headerPrefixA });
+                options.Events.OnSendIntrospectionRequest = context =>
+                {
+                    // Assert
+                    var headers = context.Request.Headers;
+                    var keys = headers.Select(x => x.Key).ToArray();
+
+                    Assert.Contains(new[] { xCorrelationId, xForwardedFor, aHttpHeader, aNotherHeader }, (x => keys.Contains(x)));
+                    Assert.Contains(correlationId, headers.Single(x => x.Key.Equals(xCorrelationId, StringComparison.Ordinal)).Value);
+                    Assert.Contains(forwardedFor, headers.Single(x => x.Key.Equals(xForwardedFor, StringComparison.Ordinal)).Value);
+
+                    Assert.Contains(ahttpHeaderVal, headers.Single(x => x.Key.Equals(aHttpHeader, StringComparison.Ordinal)).Value);
+                    Assert.Contains(aNotherHeaderVal, headers.Single(x => x.Key.Equals(aNotherHeader, StringComparison.Ordinal)).Value);
+
+                    return Task.FromResult(0);
+                };
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "valid-token");
+            request.Headers.Add(xCorrelationId, new List<string> { correlationId });
+            request.Headers.Add(xForwardedFor, new List<string> { forwardedFor });
+            request.Headers.Add(aHttpHeader, new List<string> { ahttpHeaderVal });
+            request.Headers.Add(aNotherHeader, new List<string> { aNotherHeaderVal });
+            request.Headers.Add("Some-Http-Header", new List<string> { "header-value" });
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
         private static TestServer CreateResourceServer(Action<OAuthIntrospectionOptions> configuration = null)
         {
             var server = CreateAuthorizationServer();

@@ -15,6 +15,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Infrastructure;
 using Newtonsoft.Json;
@@ -350,6 +351,11 @@ namespace Owin.Security.OAuth.Introspection
             var request = new HttpRequestMessage(HttpMethod.Post, configuration.IntrospectionEndpoint);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
+            if (Options.IncludeHttpHeadersFromRequest)
+            {
+                CopyMatchingHttpHeaders(request);
+            }
+
             // Note: always specify the token_type_hint to help
             // the authorization server make a faster token lookup.
             var parameters = new Dictionary<string, string>
@@ -433,6 +439,34 @@ namespace Owin.Security.OAuth.Introspection
                     Logger.LogError(exception, "An error occurred while deserializing the introspection response.");
 
                     return null;
+                }
+            }
+        }
+
+        private void CopyMatchingHttpHeaders(HttpRequestMessage request)
+        {
+            var prefixHeaders = new HeaderDictionary(new Dictionary<string, string[]>());
+            foreach (var prefix in Options.MatchingHttpHeadersPrefixes)
+            {
+                var customHeaders = Request.Headers.Where(x => x.Key.StartsWith(prefix));
+                foreach (var header in customHeaders)
+                {
+                    prefixHeaders.Add(header);
+                }
+            }
+
+            var exactHeaders = Request.Headers.Join(Options.MatchingHttpHeadersExact, h => h.Key, me => me, (h, me) => h).Distinct();
+            var distinctHeaders = exactHeaders.Union(prefixHeaders).ToList();
+
+            foreach (var header in distinctHeaders)
+            {
+                if (header.Value.Count() > 1)
+                {
+                    request.Headers.Add(header.Key, header.Value.ToArray());
+                }
+                else
+                {
+                    request.Headers.Add(header.Key, header.Value.Single());
                 }
             }
         }
