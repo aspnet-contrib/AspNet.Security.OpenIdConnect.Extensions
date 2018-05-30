@@ -265,7 +265,7 @@ namespace Owin.Security.OAuth.Validation.Tests
                 {
                     context.Token = "invalid-token";
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -291,7 +291,7 @@ namespace Owin.Security.OAuth.Validation.Tests
                 {
                     context.Token = "valid-token";
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -319,7 +319,7 @@ namespace Owin.Security.OAuth.Validation.Tests
                     context.Ticket = null;
                     context.HandleValidation();
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -349,7 +349,7 @@ namespace Owin.Security.OAuth.Validation.Tests
                     context.Ticket = new AuthenticationTicket(identity, new AuthenticationProperties());
                     context.HandleValidation();
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -367,6 +367,37 @@ namespace Owin.Security.OAuth.Validation.Tests
         }
 
         [Fact]
+        public async Task AuthenticateCoreAsync_HandleDecryptionWithTicketFromDecryptTokenCauseInvalidAuthentication()
+        {
+            // Arrange
+            var server = CreateResourceServer(options =>
+            {
+                options.Events.OnDecryptToken = context =>
+                {
+                    var identity = new ClaimsIdentity(OAuthValidationDefaults.AuthenticationScheme);
+                    identity.AddClaim(new Claim(OAuthValidationConstants.Claims.Subject, "Contoso"));
+
+                    context.Ticket = new AuthenticationTicket(identity, new AuthenticationProperties());
+                    context.HandleDecryption();
+
+                    return Task.CompletedTask;
+                };
+            });
+
+            var client = server.HttpClient;
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "valid-token");
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("Contoso", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
         public async Task AuthenticateCoreAsync_NullTicketFromValidateTokenCauseInvalidAuthentication()
         {
             // Arrange
@@ -376,7 +407,7 @@ namespace Owin.Security.OAuth.Validation.Tests
                 {
                     context.Ticket = null;
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -405,7 +436,7 @@ namespace Owin.Security.OAuth.Validation.Tests
 
                     context.Ticket = new AuthenticationTicket(identity, new AuthenticationProperties());
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -440,7 +471,7 @@ namespace Owin.Security.OAuth.Validation.Tests
                     Assert.Equal("custom_realm", context.Realm);
                     Assert.Equal("custom_scope", context.Scope);
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -488,7 +519,7 @@ namespace Owin.Security.OAuth.Validation.Tests
                     context.HandleResponse();
                     context.OwinContext.Response.Headers["X-Custom-Authentication-Header"] = "Bearer";
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -528,7 +559,7 @@ namespace Owin.Security.OAuth.Validation.Tests
                     context.Realm = realm;
                     context.Scope = scope;
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -664,7 +695,7 @@ namespace Owin.Security.OAuth.Validation.Tests
 
                     context.Authentication.Challenge(properties, OAuthValidationDefaults.AuthenticationScheme);
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 }));
 
                 app.Run(context =>
@@ -674,7 +705,7 @@ namespace Owin.Security.OAuth.Validation.Tests
                     {
                         context.Authentication.Challenge();
 
-                        return Task.FromResult(0);
+                        return Task.CompletedTask;
                     }
 
                     var identifier = context.Authentication.User.FindFirst(OAuthValidationConstants.Claims.Subject).Value;

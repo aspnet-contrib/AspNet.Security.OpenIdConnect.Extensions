@@ -330,7 +330,7 @@ namespace Owin.Security.OAuth.Introspection.Tests
                 {
                     context.Token = "invalid-token";
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -356,7 +356,7 @@ namespace Owin.Security.OAuth.Introspection.Tests
                 {
                     context.Token = "valid-token";
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -384,7 +384,7 @@ namespace Owin.Security.OAuth.Introspection.Tests
                     context.Ticket = null;
                     context.HandleValidation();
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -414,7 +414,7 @@ namespace Owin.Security.OAuth.Introspection.Tests
                     context.Ticket = new AuthenticationTicket(identity, new AuthenticationProperties());
                     context.HandleValidation();
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -441,7 +441,7 @@ namespace Owin.Security.OAuth.Introspection.Tests
                 {
                     context.Ticket = null;
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -470,7 +470,7 @@ namespace Owin.Security.OAuth.Introspection.Tests
 
                     context.Ticket = new AuthenticationTicket(identity, new AuthenticationProperties());
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -505,7 +505,7 @@ namespace Owin.Security.OAuth.Introspection.Tests
                     Assert.Equal("custom_realm", context.Realm);
                     Assert.Equal("custom_scope", context.Scope);
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -553,7 +553,7 @@ namespace Owin.Security.OAuth.Introspection.Tests
                     context.HandleResponse();
                     context.OwinContext.Response.Headers["X-Custom-Authentication-Header"] = "Bearer";
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -593,7 +593,7 @@ namespace Owin.Security.OAuth.Introspection.Tests
                     context.Realm = realm;
                     context.Scope = scope;
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -670,7 +670,7 @@ namespace Owin.Security.OAuth.Introspection.Tests
 
                     context.Authentication.Challenge(properties, OAuthIntrospectionDefaults.AuthenticationScheme);
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 }));
 
                 app.Run(context =>
@@ -680,7 +680,7 @@ namespace Owin.Security.OAuth.Introspection.Tests
                     {
                         context.Authentication.Challenge();
 
-                        return Task.FromResult(0);
+                        return Task.CompletedTask;
                     }
 
                     var subject = context.Authentication.User.FindFirst(OAuthIntrospectionConstants.Claims.Subject)?.Value;
@@ -688,7 +688,7 @@ namespace Owin.Security.OAuth.Introspection.Tests
                     {
                         context.Authentication.Challenge();
 
-                        return Task.FromResult(0);
+                        return Task.CompletedTask;
                     }
 
                     return context.Response.WriteAsync(subject);

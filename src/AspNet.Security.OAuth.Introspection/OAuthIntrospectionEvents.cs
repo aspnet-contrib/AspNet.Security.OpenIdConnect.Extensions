@@ -17,27 +17,27 @@ namespace AspNet.Security.OAuth.Introspection
         /// <summary>
         /// Invoked when a challenge response is returned to the caller.
         /// </summary>
-        public Func<ApplyChallengeContext, Task> OnApplyChallenge { get; set; } = context => Task.FromResult(0);
+        public Func<ApplyChallengeContext, Task> OnApplyChallenge { get; set; } = context => Task.CompletedTask;
 
         /// <summary>
         /// Invoked when a ticket is to be created from an introspection response.
         /// </summary>
-        public Func<CreateTicketContext, Task> OnCreateTicket { get; set; } = context => Task.FromResult(0);
+        public Func<CreateTicketContext, Task> OnCreateTicket { get; set; } = context => Task.CompletedTask;
 
         /// <summary>
         /// Invoked when a token is to be sent to the authorization server for introspection.
         /// </summary>
-        public Func<SendIntrospectionRequestContext, Task> OnSendIntrospectionRequest { get; set; } = context => Task.FromResult(0);
+        public Func<SendIntrospectionRequestContext, Task> OnSendIntrospectionRequest { get; set; } = context => Task.CompletedTask;
 
         /// <summary>
         /// Invoked when a token is to be parsed from a newly-received request.
         /// </summary>
-        public Func<RetrieveTokenContext, Task> OnRetrieveToken { get; set; } = context => Task.FromResult(0);
+        public Func<RetrieveTokenContext, Task> OnRetrieveToken { get; set; } = context => Task.CompletedTask;
 
         /// <summary>
         /// Invoked when a token is to be validated, before final processing.
         /// </summary>
-        public Func<ValidateTokenContext, Task> OnValidateToken { get; set; } = context => Task.FromResult(0);
+        public Func<ValidateTokenContext, Task> OnValidateToken { get; set; } = context => Task.CompletedTask;
 
         /// <summary>
         /// Invoked when a challenge response is returned to the caller.

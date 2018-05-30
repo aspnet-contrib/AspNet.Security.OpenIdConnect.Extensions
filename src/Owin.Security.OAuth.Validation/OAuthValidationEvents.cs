@@ -17,22 +17,27 @@ namespace Owin.Security.OAuth.Validation
         /// <summary>
         /// Invoked when a challenge response is returned to the caller.
         /// </summary>
-        public Func<ApplyChallengeContext, Task> OnApplyChallenge { get; set; } = context => Task.FromResult(0);
+        public Func<ApplyChallengeContext, Task> OnApplyChallenge { get; set; } = context => Task.CompletedTask;
 
         /// <summary>
         /// Invoked when a ticket is to be created from an access token.
         /// </summary>
-        public Func<CreateTicketContext, Task> OnCreateTicket { get; set; } = context => Task.FromResult(0);
+        public Func<CreateTicketContext, Task> OnCreateTicket { get; set; } = context => Task.CompletedTask;
+
+        /// <summary>
+        /// Invoked when a token is to be decrypted.
+        /// </summary>
+        public Func<DecryptTokenContext, Task> OnDecryptToken { get; set; } = context => Task.CompletedTask;
 
         /// <summary>
         /// Invoked when a token is to be parsed from a newly-received request.
         /// </summary>
-        public Func<RetrieveTokenContext, Task> OnRetrieveToken { get; set; } = context => Task.FromResult(0);
+        public Func<RetrieveTokenContext, Task> OnRetrieveToken { get; set; } = context => Task.CompletedTask;
 
         /// <summary>
         /// Invoked when a token is to be validated, before final processing.
         /// </summary>
-        public Func<ValidateTokenContext, Task> OnValidateToken { get; set; } = context => Task.FromResult(0);
+        public Func<ValidateTokenContext, Task> OnValidateToken { get; set; } = context => Task.CompletedTask;
 
         /// <summary>
         /// Invoked when a challenge response is returned to the caller.
@@ -43,6 +48,11 @@ namespace Owin.Security.OAuth.Validation
         /// Invoked when a ticket is to be created from an access token.
         /// </summary>
         public virtual Task CreateTicket(CreateTicketContext context) => OnCreateTicket(context);
+
+        /// <summary>
+        /// Invoked when a token is to be decrypted.
+        /// </summary>
+        public virtual Task DecryptToken(DecryptTokenContext context) => OnDecryptToken(context);
 
         /// <summary>
         /// Invoked when a token is to be parsed from a newly-received request.

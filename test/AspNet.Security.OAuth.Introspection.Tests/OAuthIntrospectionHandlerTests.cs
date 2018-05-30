@@ -471,7 +471,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests
                 {
                     context.Token = "invalid-token";
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -497,7 +497,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests
                 {
                     context.Token = "valid-token";
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -524,7 +524,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests
                 {
                     context.Fail(new Exception());
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -550,7 +550,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests
                 {
                     context.NoResult();
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -580,7 +580,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests
                     context.Principal = new ClaimsPrincipal(identity);
                     context.Success();
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -607,7 +607,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests
                 {
                     context.Fail(new Exception());
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -633,7 +633,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests
                 {
                     context.NoResult();
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -663,7 +663,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests
                     context.Principal = new ClaimsPrincipal(identity);
                     context.Success();
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -698,7 +698,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests
                     Assert.Equal("custom_realm", context.Realm);
                     Assert.Equal("custom_scope", context.Scope);
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -746,7 +746,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests
                     context.HandleResponse();
                     context.HttpContext.Response.Headers["X-Custom-Authentication-Header"] = "Bearer";
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -786,7 +786,7 @@ namespace AspNet.Security.OAuth.Introspection.Tests
                     context.Realm = realm;
                     context.Scope = scope;
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 

@@ -348,9 +348,45 @@ namespace AspNet.Security.OAuth.Validation
             return false;
         }
 
+        private async Task<AuthenticateResult> DecryptTokenAsync(string token)
+        {
+            var notification = new DecryptTokenContext(Context, Scheme, Options, token)
+            {
+                DataFormat = Options.AccessTokenFormat
+            };
+
+            await Events.DecryptToken(notification);
+
+            if (notification.Result != null)
+            {
+                Logger.LogInformation("The default authentication handling was skipped from user code.");
+
+                return notification.Result;
+            }
+
+            if (notification.DataFormat == null)
+            {
+                throw new InvalidOperationException("A data formatter must be provided.");
+            }
+
+            var ticket = notification.DataFormat.Unprotect(token);
+            if (ticket == null)
+            {
+                return AuthenticateResult.Fail("Authentication failed because the access token was invalid.");
+            }
+
+            return AuthenticateResult.Success(ticket);
+        }
+
         private async Task<AuthenticateResult> CreateTicketAsync(string token)
         {
-            var ticket = Options.AccessTokenFormat.Unprotect(token);
+            var result = await DecryptTokenAsync(token);
+            if (!result.Succeeded)
+            {
+                return result;
+            }
+
+            var ticket = result.Ticket;
             if (ticket == null)
             {
                 return AuthenticateResult.Fail("Authentication failed because the access token was invalid.");

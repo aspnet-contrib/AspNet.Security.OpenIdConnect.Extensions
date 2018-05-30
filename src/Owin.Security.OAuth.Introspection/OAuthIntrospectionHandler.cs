@@ -749,7 +749,7 @@ namespace Owin.Security.OAuth.Introspection
         {
             if (Options.CachingPolicy == null)
             {
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             var bytes = Encoding.UTF8.GetBytes(Options.AccessTokenFormat.Protect(ticket));

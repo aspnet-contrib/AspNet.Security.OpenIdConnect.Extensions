@@ -267,7 +267,7 @@ namespace AspNet.Security.OAuth.Validation.Tests
                 {
                     context.Token = "invalid-token";
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -293,7 +293,7 @@ namespace AspNet.Security.OAuth.Validation.Tests
                 {
                     context.Token = "valid-token";
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -320,7 +320,7 @@ namespace AspNet.Security.OAuth.Validation.Tests
                 {
                     context.Fail(new Exception());
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -346,7 +346,7 @@ namespace AspNet.Security.OAuth.Validation.Tests
                 {
                     context.NoResult();
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -376,7 +376,7 @@ namespace AspNet.Security.OAuth.Validation.Tests
                     context.Principal = new ClaimsPrincipal(identity);
                     context.Success();
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -394,6 +394,89 @@ namespace AspNet.Security.OAuth.Validation.Tests
         }
 
         [Fact]
+        public async Task HandleAuthenticateAsync_FailFromDecryptTokenCausesInvalidAuthentication()
+        {
+            // Arrange
+            var server = CreateResourceServer(options =>
+            {
+                options.Events.OnDecryptToken = context =>
+                {
+                    context.Fail(new Exception());
+
+                    return Task.CompletedTask;
+                };
+            });
+
+            var client = server.CreateClient();
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "valid-token");
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task HandleAuthenticateAsync_NoResultFromDecryptTokenCauseInvalidAuthentication()
+        {
+            // Arrange
+            var server = CreateResourceServer(options =>
+            {
+                options.Events.OnDecryptToken = context =>
+                {
+                    context.NoResult();
+
+                    return Task.CompletedTask;
+                };
+            });
+
+            var client = server.CreateClient();
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "valid-token");
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task HandleAuthenticateAsync_SuccessFromDecryptTokenCauseSuccessfulAuthentication()
+        {
+            // Arrange
+            var server = CreateResourceServer(options =>
+            {
+                options.Events.OnDecryptToken = context =>
+                {
+                    var identity = new ClaimsIdentity(OAuthValidationDefaults.AuthenticationScheme);
+                    identity.AddClaim(new Claim(OAuthValidationConstants.Claims.Subject, "Contoso"));
+
+                    context.Principal = new ClaimsPrincipal(identity);
+                    context.Success();
+
+                    return Task.CompletedTask;
+                };
+            });
+
+            var client = server.CreateClient();
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "/");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "valid-token");
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("Contoso", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
         public async Task HandleAuthenticateAsync_FailFromValidateTokenCausesInvalidAuthentication()
         {
             // Arrange
@@ -403,7 +486,7 @@ namespace AspNet.Security.OAuth.Validation.Tests
                 {
                     context.Fail(new Exception());
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -429,7 +512,7 @@ namespace AspNet.Security.OAuth.Validation.Tests
                 {
                     context.NoResult();
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -459,7 +542,7 @@ namespace AspNet.Security.OAuth.Validation.Tests
                     context.Principal = new ClaimsPrincipal(identity);
                     context.Success();
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -494,7 +577,7 @@ namespace AspNet.Security.OAuth.Validation.Tests
                     Assert.Equal("custom_realm", context.Realm);
                     Assert.Equal("custom_scope", context.Scope);
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -542,7 +625,7 @@ namespace AspNet.Security.OAuth.Validation.Tests
                     context.HandleResponse();
                     context.HttpContext.Response.Headers["X-Custom-Authentication-Header"] = "Bearer";
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
@@ -582,7 +665,7 @@ namespace AspNet.Security.OAuth.Validation.Tests
                     context.Realm = realm;
                     context.Scope = scope;
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 };
             });
 
