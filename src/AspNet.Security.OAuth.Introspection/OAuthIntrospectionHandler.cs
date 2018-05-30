@@ -411,7 +411,20 @@ namespace AspNet.Security.OAuth.Introspection
             // See https://tools.ietf.org/html/rfc6749#section-2.3.1 for more information.
             else
             {
-                var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{Options.ClientId}:{Options.ClientSecret}"));
+                string EscapeDataString(string value)
+                {
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        return null;
+                    }
+
+                    return Uri.EscapeDataString(value).Replace("%20", "+");
+                }
+
+                var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(
+                    string.Concat(
+                        EscapeDataString(Options.ClientId), ":",
+                        EscapeDataString(Options.ClientSecret))));
 
                 request.Headers.Authorization = new AuthenticationHeaderValue(OAuthIntrospectionConstants.Schemes.Basic, credentials);
             }
