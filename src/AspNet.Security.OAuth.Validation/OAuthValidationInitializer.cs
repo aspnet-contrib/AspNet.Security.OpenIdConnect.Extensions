@@ -62,7 +62,7 @@ namespace AspNet.Security.OAuth.Validation
             {
                 // Note: the following purposes must match the ones used by the OpenID Connect server middleware.
                 var protector = options.DataProtectionProvider.CreateProtector(
-                    "OpenIdConnectServerHandler", nameof(options.AccessTokenFormat), "ASOS");
+                    "OpenIdConnectServerHandler", nameof(options.AccessTokenFormat), name);
 
                 options.AccessTokenFormat = new TicketDataFormat(protector);
             }
