@@ -1,7 +1,7 @@
 AspNet.Security.OAuth.Extensions
 ================================
 
-**AspNet.Security.OAuth.Extensions** is a collection of **token validation middleware** for ASP.NET Core 1.0 and OWIN/Katana.
+**AspNet.Security.OAuth.Extensions** is a collection of **token validation middleware** for ASP.NET Core and OWIN/Katana.
 
 **The latest nightly builds can be found on [MyGet](https://www.myget.org/gallery/aspnet-contrib)**.
 

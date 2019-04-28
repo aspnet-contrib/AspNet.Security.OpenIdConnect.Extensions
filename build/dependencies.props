@@ -3,18 +3,18 @@
   <PropertyGroup Label="Package Versions">
     <AspNetCoreVersion>2.0.0</AspNetCoreVersion>
     <CoreFxVersion>4.4.0</CoreFxVersion>
-    <IdentityModelVersion>5.2.0-preview1-408290725</IdentityModelVersion>
-    <IdentityModelCoreVersion>2.1.4</IdentityModelCoreVersion>
+    <IdentityModelVersion>5.4.0</IdentityModelVersion>
+    <IdentityModelCoreVersion>5.4.0</IdentityModelCoreVersion>
     <JetBrainsVersion>10.3.0</JetBrainsVersion>
-    <JsonNetVersion>10.0.2</JsonNetVersion>
-    <MoqVersion>4.7.63</MoqVersion>
-    <NetHttpVersion>4.3.2</NetHttpVersion>
+    <JsonNetVersion>12.0.1</JsonNetVersion>
+    <MoqVersion>4.10.1</MoqVersion>
+    <NetHttpVersion>4.3.4</NetHttpVersion>
     <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
     <NetStandardLibraryNetFrameworkVersion>2.0.0</NetStandardLibraryNetFrameworkVersion>
     <OwinVersion>4.0.0-alpha1</OwinVersion>
     <RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
-    <TestSdkVersion>15.3.0</TestSdkVersion>
-    <XunitVersion>2.3.1</XunitVersion>
+    <TestSdkVersion>16.0.1</TestSdkVersion>
+    <XunitVersion>2.4.1</XunitVersion>
   </PropertyGroup>
 
 </Project>
